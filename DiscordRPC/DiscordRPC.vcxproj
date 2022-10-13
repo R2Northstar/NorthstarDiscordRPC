@@ -175,8 +175,8 @@
     <ClInclude Include="library\types.h" />
     <ClInclude Include="library\user_manager.h" />
     <ClInclude Include="library\voice_manager.h" />
-    <ClInclude Include="pch.h" />
     <ClInclude Include="discord_plugin.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -189,19 +189,12 @@
     <ClCompile Include="library\lobby_manager.cpp" />
     <ClCompile Include="library\network_manager.cpp" />
     <ClCompile Include="library\overlay_manager.cpp" />
-    <ClCompile Include="library\pch.cpp" />
     <ClCompile Include="library\relationship_manager.cpp" />
     <ClCompile Include="library\storage_manager.cpp" />
     <ClCompile Include="library\store_manager.cpp" />
     <ClCompile Include="library\types.cpp" />
     <ClCompile Include="library\user_manager.cpp" />
     <ClCompile Include="library\voice_manager.cpp" />
-    <ClCompile Include="pch.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="discord_plugin.cpp" />
   </ItemGroup>
   <ItemGroup>

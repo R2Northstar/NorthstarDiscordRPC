@@ -156,4 +156,3 @@ Result StorageManager::GetPath(char path[4096])
 }
 
 } // namespace discord
-#include "pch.h"

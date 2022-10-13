@@ -76,4 +76,3 @@ void ApplicationManager::GetTicket(std::function<void(Result, char const*)> call
 }
 
 } // namespace discord
-#include "pch.h"

@@ -55,4 +55,3 @@ Result ImageManager::GetData(ImageHandle handle, std::uint8_t* data, std::uint32
 }
 
 } // namespace discord
-#include "pch.h"

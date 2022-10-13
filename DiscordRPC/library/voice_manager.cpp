@@ -13,7 +13,7 @@ namespace discord {
 
 class VoiceEvents final {
 public:
-    static void OnSettingsUpdate(void* callbackData)
+    static void DISCORD_CALLBACK OnSettingsUpdate(void* callbackData)
     {
         auto* core = reinterpret_cast<Core*>(callbackData);
         if (!core) {
@@ -122,4 +122,3 @@ Result VoiceManager::SetLocalVolume(Snowflake userId, std::uint8_t volume)
 }
 
 } // namespace discord
-#include "pch.h"

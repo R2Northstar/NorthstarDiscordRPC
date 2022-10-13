@@ -180,4 +180,3 @@ discord::AchievementManager& Core::AchievementManager()
 }
 
 } // namespace discord
-#include "pch.h"

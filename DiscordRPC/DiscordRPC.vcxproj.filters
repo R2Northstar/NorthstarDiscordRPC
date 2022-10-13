@@ -78,9 +78,6 @@
     <ClInclude Include="library\user_manager.h">
       <Filter>Header Files\sdk</Filter>
     </ClInclude>
-    <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,12 +90,12 @@
     <ClInclude Include="discord_plugin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="library\core.cpp">
@@ -141,9 +138,6 @@
       <Filter>Source Files\sdk</Filter>
     </ClCompile>
     <ClCompile Include="library\image_manager.cpp">
-      <Filter>Source Files\sdk</Filter>
-    </ClCompile>
-    <ClCompile Include="library\pch.cpp">
       <Filter>Source Files\sdk</Filter>
     </ClCompile>
     <ClCompile Include="discord_plugin.cpp">

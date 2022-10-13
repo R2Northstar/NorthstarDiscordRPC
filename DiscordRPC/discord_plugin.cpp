@@ -102,170 +102,159 @@ static struct PluginData
 
 int main(int, char**)
 {
-	discord::Core* core{};
-	auto result = discord::Core::Create(941428101429231617, DiscordCreateFlags_NoRequireDiscord, &core);
-	state.core.reset(core);
-	if (!state.core)
-	{
-		std::cout << "Failed to instantiate discord core! (err " << static_cast<int>(result) << ")\n";
-		return -1;
-	}
+	char path[MAX_PATH]{};
+	GetModuleFileNameA(NULL, path, MAX_PATH);
+	std::string exepath{ path };
+	exepath += " -discord";
 
-	std::cout << "Instantiated discord core!\n";
+    DiscordState state{};
 
-	state.core->SetLogHook(
-		discord::LogLevel::Debug, [](discord::LogLevel level, const char* message)
-		{ std::cerr << "Log(" << static_cast<uint32_t>(level) << "): " << message << "\n"; });
+    discord::Core* core{};
 
-	discord::Activity activity{};
+    SetEnvironmentVariable(L"DISCORD_INSTANCE_ID", L"1");
+    auto result = discord::Core::Create(938555054145818704, DiscordCreateFlags_Default, &core);
+    state.core.reset(core);
 
-	const auto p1 = std::chrono::system_clock::now().time_since_epoch();
-	activity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(p1).count());
+    if (!state.core) {
+        std::cout << "Failed to instantiate discord core! (err " << static_cast<int>(result)
+            << ")\n";
+        std::exit(-1);
+    }
 
+    state.core->SetLogHook(
+        discord::LogLevel::Debug, [](discord::LogLevel level, const char* message) {
+            std::cerr << "Log(" << static_cast<uint32_t>(level) << "): " << message << "\n";
+        });
 
+    //state.core->ActivityManager().RegisterCommand("steam://run-game-id/123");
+    state.core->ActivityManager().RegisterSteam(123);
 
-	activity.SetDetails("");
-	activity.SetState("Loading...");
-	activity.GetAssets().SetLargeImage("northstar");
-	activity.GetAssets().SetLargeText("");
-	activity.SetType(discord::ActivityType::Playing);
+    state.core->ActivityManager().OnActivityJoin.Connect(
+        [](const char* secret) {
+            std::cout << "Join " << secret << "\n";
+        });
+    state.core->ActivityManager().OnActivitySpectate.Connect(
+        [](const char* secret) { std::cout << "Spectate " << secret << "\n"; });
+    state.core->ActivityManager().OnActivityJoinRequest.Connect([](discord::User const& user) {
+        std::cout << "Join Request " << user.GetUsername() << "\n";
+        });
+    state.core->ActivityManager().OnActivityInvite.Connect(
+        [](discord::ActivityActionType, discord::User const& user, discord::Activity const&) {
+            std::cout << "Invite " << user.GetUsername() << "\n";
+        });
 
-	activity.GetParty().GetSize().SetCurrentSize(4);
-	activity.GetParty().GetSize().SetMaxSize(12);
+    state.core->LobbyManager().OnLobbyUpdate.Connect(
+        [](std::int64_t lobbyId) { std::cout << "Lobby update " << lobbyId << "\n"; });
 
+    state.core->LobbyManager().OnLobbyDelete.Connect(
+        [](std::int64_t lobbyId, std::uint32_t reason) {
+            std::cout << "Lobby delete " << lobbyId << " (reason: " << reason << ")\n";
+        });
 
-	state.core->ActivityManager().UpdateActivity(
-		activity,
-		[](discord::Result result)
-		{
-			printf(((result == discord::Result::Ok) ? "Succeeded" : "Failed"));
-			printf("\n");
-		});
+    state.core->LobbyManager().OnMemberConnect.Connect(
+        [](std::int64_t lobbyId, std::int64_t userId) {
+            std::cout << "Lobby member connect " << lobbyId << " userId " << userId << "\n";
+        });
 
-	std::signal(SIGINT, [](int) { interrupted = true; });
+    state.core->LobbyManager().OnMemberUpdate.Connect(
+        [](std::int64_t lobbyId, std::int64_t userId) {
+            std::cout << "Lobby member update " << lobbyId << " userId " << userId << "\n";
+        });
 
-	do
-	{
-		state.core->RunCallbacks();
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    state.core->LobbyManager().OnMemberDisconnect.Connect(
+        [](std::int64_t lobbyId, std::int64_t userId) {
+            std::cout << "Lobby member disconnect " << lobbyId << " userId " << userId << "\n";
+        });
 
-		std::string details = "Score: ";
+    state.core->LobbyManager().OnLobbyMessage.Connect([&](std::int64_t lobbyId,
+        std::int64_t userId,
+        std::uint8_t* payload,
+        std::uint32_t payloadLength) {
+            std::vector<uint8_t> buffer{};
+            buffer.resize(payloadLength);
+            memcpy(buffer.data(), payload, payloadLength);
+            std::cout << "Lobby message " << lobbyId << " from " << userId << " of length "
+                << payloadLength << " bytes.\n";
 
-		(*gameStatePtr).getGameStateChar(pluginData.playlist, sizeof(pluginData.playlist), GameStateInfoType::playlist);
-		(*gameStatePtr).getGameStateChar(pluginData.playlistDisplayName, sizeof(pluginData.playlistDisplayName), GameStateInfoType::playlistDisplayName);
-		(*gameStatePtr).getGameStateChar(pluginData.map, sizeof(pluginData.map), GameStateInfoType::map);
-		(*gameStatePtr).getGameStateChar(pluginData.mapDisplayName, sizeof(pluginData.mapDisplayName), GameStateInfoType::mapDisplayName);
-		(*gameStatePtr).getGameStateBool(&pluginData.loading, GameStateInfoType::loading);
-		(*gameStatePtr).getGameStateInt(&pluginData.players, GameStateInfoType::players);
-		(*serverInfoPtr).getServerInfoInt(&pluginData.maxPlayers, ServerInfoType::maxPlayers);
+            char fourtyNinetySix[4096];
+            state.core->LobbyManager().GetLobbyMetadataValue(lobbyId, "foo", fourtyNinetySix);
 
+            std::cout << "Metadata for key foo is " << fourtyNinetySix << "\n";
+        });
 
-		activity.SetState(pluginData.playlistDisplayName);
-		activity.GetAssets().SetLargeImage(pluginData.map);
-		activity.GetAssets().SetLargeText(pluginData.mapDisplayName);
-		if (!strncmp(pluginData.map, "", 1))
-		{
-			activity.GetParty().GetSize().SetCurrentSize(0);
-			activity.GetParty().GetSize().SetMaxSize(0);
-			activity.SetDetails("Main Menu");
-			activity.SetState("On Main Menu");
-			activity.GetAssets().SetLargeImage("northstar");
-			activity.GetAssets().SetLargeText("Titanfall 2 + Northstar");
-			activity.GetAssets().SetSmallImage("");
-			activity.GetAssets().SetSmallText("");
-			activity.GetTimestamps().SetEnd(0);
-			if (wasInGame)
-			{
-				const auto p1 = std::chrono::system_clock::now().time_since_epoch();
-				activity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(p1).count());
-				wasInGame = false;
-				resetSinglePlayerTimer = true;
-			}
-		}
-		else if (!strncmp(pluginData.map, "mp_lobby", 9))
-		{
-			activity.SetState("In the Lobby");
-			activity.GetParty().GetSize().SetCurrentSize(0);
-			activity.GetParty().GetSize().SetMaxSize(0);
-			activity.SetDetails("Lobby");
-			activity.GetAssets().SetLargeImage("northstar");
-			activity.GetAssets().SetLargeText("Titanfall 2 + Northstar");
-			activity.GetAssets().SetSmallImage("");
-			activity.GetAssets().SetSmallText("");
-			activity.GetTimestamps().SetEnd(0);
-			if (wasInGame)
-			{
-				const auto p1 = std::chrono::system_clock::now().time_since_epoch();
-				activity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(p1).count());
-				wasInGame = false;
-				resetSinglePlayerTimer = true;
-			}
-		}
-		else
-		{
-			if (!pluginData.loading)
-			{
-				// Hack to make singleplayer work for now
-				activity.GetParty().GetSize().SetCurrentSize(pluginData.players);
-				activity.GetParty().GetSize().SetMaxSize(pluginData.maxPlayers);
-				if (!strncmp(pluginData.playlist, "Campaign", 32)) {
-					(*gameStatePtr).getGameStateChar(pluginData.playlistDisplayName, sizeof(pluginData.playlistDisplayName), GameStateInfoType::playlistDisplayName);
-					activity.SetState(pluginData.playlistDisplayName);
-					activity.SetDetails(pluginData.mapDisplayName);
-					activity.GetParty().GetSize().SetCurrentSize(0);
-					activity.GetParty().GetSize().SetMaxSize(0);
-					activity.GetTimestamps().SetEnd(0);
-					if (resetSinglePlayerTimer) {
-						const auto p1 = std::chrono::system_clock::now().time_since_epoch();
-						activity.GetTimestamps().SetStart(std::chrono::duration_cast<std::chrono::seconds>(p1).count());
-						resetSinglePlayerTimer = false;
-					}
-				}
-				else {
-					(*gameStatePtr).getGameStateInt(&pluginData.ourScore, GameStateInfoType::ourScore);
-					(*gameStatePtr).getGameStateInt(&pluginData.secondHighestScore, GameStateInfoType::secondHighestScore);
-					(*gameStatePtr).getGameStateInt(&pluginData.highestScore, GameStateInfoType::highestScore);
-					(*serverInfoPtr).getServerInfoInt(&pluginData.scoreLimit, ServerInfoType::scoreLimit);
-					(*serverInfoPtr).getServerInfoInt(&pluginData.endTime, ServerInfoType::endTime);
-					(*gameStatePtr).getGameStateChar(pluginData.playlistDisplayName, sizeof(pluginData.playlistDisplayName), GameStateInfoType::playlistDisplayName);
-					activity.SetState(pluginData.playlistDisplayName);
-					if (pluginData.ourScore == pluginData.highestScore)
-					{
-						details += std::to_string(pluginData.ourScore) + " - " + std::to_string(pluginData.secondHighestScore);
-					}
-					else
-					{
-						details += std::to_string(pluginData.ourScore) + " - " + std::to_string(pluginData.highestScore);
-					}
+    state.core->LobbyManager().OnSpeaking.Connect(
+        [&](std::int64_t, std::int64_t userId, bool speaking) {
+            std::cout << "User " << userId << " is " << (speaking ? "" : "NOT ") << "speaking.\n";
+        });
 
-					details += " (First to " + std::to_string(pluginData.scoreLimit) + ")";
-					activity.SetDetails(details.c_str());
-					const auto p1 = std::chrono::system_clock::now().time_since_epoch();
-					if (pluginData.endTime > 0) {
-						activity.GetTimestamps().SetEnd(std::chrono::duration_cast<std::chrono::seconds>(p1).count() + pluginData.endTime);
-						activity.GetTimestamps().SetStart(0);
-					}
-					resetSinglePlayerTimer = true;
-				}
-				wasInGame = true;
-			}
-			else
-			{
-				activity.GetParty().GetSize().SetCurrentSize(0);
-				activity.GetParty().GetSize().SetMaxSize(0);
-				activity.SetDetails("Loading...");
-				if (wasInGame) {
-					wasInGame = false;
-					resetSinglePlayerTimer = true;
-				}
-			}
-		}
+    discord::Activity activity{};
+    activity.SetDetails("TF3SDK");
+    activity.SetState("TF3SDK Debug Build 0.1.4");
+    activity.GetAssets().SetSmallImage("the");
+    activity.GetAssets().SetSmallText("i mage");
+    activity.GetAssets().SetLargeImage("the");
+    activity.GetAssets().SetLargeText("u mage");
 
+    activity.GetParty().GetSize().SetCurrentSize(1);
+    activity.GetParty().GetSize().SetMaxSize(5);
+    activity.GetParty().SetId("party id");
+    activity.GetParty().SetPrivacy(discord::ActivityPartyPrivacy::Public);
+    activity.SetType(discord::ActivityType::Playing);
+    state.core->ActivityManager().UpdateActivity(activity, [](discord::Result result) {
+        std::cout << ((result == discord::Result::Ok) ? "Succeeded" : "Failed")
+            << " updating activity!\n";
+        });
 
-		state.core->ActivityManager().UpdateActivity(
-			activity, [](discord::Result result) {});
+    discord::LobbyTransaction lobby{};
+    state.core->LobbyManager().GetLobbyCreateTransaction(&lobby);
+    lobby.SetCapacity(2);
+    lobby.SetMetadata("foo", "bar");
+    lobby.SetMetadata("baz", "bat");
+    lobby.SetType(discord::LobbyType::Public);
+    state.core->LobbyManager().CreateLobby(
+        lobby, [&state](discord::Result result, discord::Lobby const& lobby) {
+            if (result == discord::Result::Ok) {
+                std::cout << "Created lobby with secret " << lobby.GetSecret() << "\n";
+                std::array<uint8_t, 234> data{};
+                state.core->LobbyManager().SendLobbyMessage(
+                    lobby.GetId(),
+                    reinterpret_cast<uint8_t*>(data.data()),
+                    static_cast<uint32_t>(data.size()),
+                    [](discord::Result result) {
+                        std::cout << "Sent message. Result: " << static_cast<int>(result) << "\n";
+                    });
+            }
+            else {
+                std::cout << "Failed creating lobby. (err " << static_cast<int>(result) << ")\n";
+            }
 
-	} while (!interrupted);
+            discord::LobbySearchQuery query{};
+            state.core->LobbyManager().GetSearchQuery(&query);
+            query.Limit(1);
+            state.core->LobbyManager().Search(query, [&state](discord::Result result) {
+                if (result == discord::Result::Ok) {
+                    std::int32_t lobbyCount{};
+                    state.core->LobbyManager().LobbyCount(&lobbyCount);
+                    std::cout << "Lobby search succeeded with " << lobbyCount << " lobbies.\n";
+                    for (auto i = 0; i < lobbyCount; ++i) {
+                        discord::LobbyId lobbyId{};
+                        state.core->LobbyManager().GetLobbyId(i, &lobbyId);
+                        std::cout << "  " << lobbyId << "\n";
+                    }
+                }
+                else {
+                    std::cout << "Lobby search failed. (err " << static_cast<int>(result) << ")\n";
+                }
+                });
+        });
 
-	return 0;
+    std::signal(SIGINT, [](int) { interrupted = true; });
+
+    do {
+        state.core->RunCallbacks();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    } while (!interrupted);
+
+    return 0;
 }
