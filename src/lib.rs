@@ -1,6 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use discord_presence::{Client, DiscordError};
+use discord_presence::Client;
 use rrplug::prelude::*;
 
 const EMPTY: String = String::new();
@@ -16,6 +16,8 @@ struct ActivityData {
     large_text: String,
     small_image: String,
     small_text: String,
+    end: Option<u64>,
+    start: Option<u64>,
 }
 
 struct DiscordRpc {
@@ -42,21 +44,18 @@ impl Plugin for DiscordRpc {
         let serverinfo = self.serverinfo.as_ref().unwrap();
 
         let mut drpc = Client::new(941428101429231617);
-        let _ = drpc.start();
-        
-        loop {
-            match drpc.set_activity(|act| act.state("Playing") ) {
-                Ok(_) => break,
-                Err(err) => match err {
-                    DiscordError::NotStarted => wait(1000), // I think this would stop the no discord opened crashes
-                    _ => panic!( "the following error prefented discord rpc from starting : {:?}", err ),
-                },
-            }
-        }
+
+        let _ =drpc.start();
         println!("discord rpc initialized");
-        
 
         loop {
+            if let Err(err) = drpc.clear_activity() {
+                #[cfg(debug_assertions)]
+                println!("coudln't clear activity because of {:?}", err)
+            }
+
+            println!("started a cycle");
+
             let playlist = gamestate.playlist();
             let playlist_display_name = gamestate.playlist_display_name();
             let map = gamestate.map();
@@ -65,8 +64,20 @@ impl Plugin for DiscordRpc {
             let players = gamestate.players() as u32;
             let max_players = serverinfo.max_players() as u32;
 
+            let mut data = ActivityData {
+                party: (0, 0),
+                details: EMPTY,
+                state: EMPTY,
+                large_image: EMPTY,
+                large_text: EMPTY,
+                small_image: EMPTY,
+                small_text: EMPTY,
+                end: None,
+                start: None,
+            };
+
             if map.is_empty() {
-                let data = ActivityData {
+                data = ActivityData {
                     party: (0, 0),
                     details: "Main Menu".to_string(),
                     state: "On Main Menu".to_string(),
@@ -74,20 +85,18 @@ impl Plugin for DiscordRpc {
                     large_text: "Titanfall 2 + Northstar".to_string(),
                     small_image: EMPTY,
                     small_text: EMPTY,
+                    end: Some(0),
+                    start: None,
                 };
 
-                set_activity(&mut drpc, data).expect("Failed to set activity");
-
-                set_end(&mut drpc, 0);
-
                 if get_was_in_game() {
-                    reset_timer(&mut drpc);
+                    reset_timer(&mut data);
 
                     set_was_in_game(false);
                     set_reset_single_player_timer(true);
                 }
             } else if map.starts_with("mp_lobby") {
-                let data = ActivityData {
+                data = ActivityData {
                     party: (0, 0),
                     details: "Lobby".to_string(),
                     state: "In the Lobby".to_string(),
@@ -95,119 +104,118 @@ impl Plugin for DiscordRpc {
                     large_text: "Titanfall 2 + Northstar".to_string(),
                     small_image: EMPTY,
                     small_text: EMPTY,
+                    end: Some(0),
+                    start: None,
                 };
 
-                set_activity(&mut drpc, data).expect("Failed to set activity");
-
-                set_end(&mut drpc, 0);
-
                 if get_was_in_game() {
-                    reset_timer(&mut drpc);
+                    reset_timer(&mut data);
 
                     set_was_in_game(false);
                     set_reset_single_player_timer(true);
                 }
+            } else if loading {
+                data.party = (players, max_players);
+                data.details = "Loading...".to_string();
+                if get_was_in_game() {
+                    set_was_in_game(false);
+                    set_reset_single_player_timer(true);
+                }
             } else {
-                if loading {
-                    drpc.set_activity(|act| act.party(|party| party.size((players, max_players))))
-                        .expect("Failed to set activity");
-                    drpc.set_activity(|act| act.details("Loading..."))
-                        .expect("Failed to set activity");
-                    if get_was_in_game() {
+                data.party = (players, max_players);
+
+                if playlist.starts_with("Campaign") {
+                    data = ActivityData {
+                        party: (0, 0),
+                        details: map_display_name,
+                        state: playlist_display_name,
+                        large_image: EMPTY,
+                        large_text: EMPTY,
+                        small_image: EMPTY,
+                        small_text: EMPTY,
+                        end: Some(0),
+                        start: None,
+                    };
+
+                    if get_reset_single_player_timer() {
+                        reset_timer(&mut data);
+
                         set_was_in_game(false);
                         set_reset_single_player_timer(true);
                     }
                 } else {
-                    drpc.set_activity(|act| act.party(|party| party.size((players, max_players))))
-                        .expect("Failed to set activity");
+                    let our_score = gamestate.our_score();
+                    let second_highest_score = gamestate.second_highest_score();
+                    let highest_score = gamestate.highest_score();
+                    let score_limit = serverinfo.score_limit();
+                    let endtime = serverinfo.end_time() as u64;
 
-                    if playlist.starts_with("Campaign") {
-                        let data = ActivityData {
-                            party: (0, 0),
-                            details: map_display_name,
-                            state: playlist_display_name,
-                            large_image: EMPTY,
-                            large_text: EMPTY,
-                            small_image: EMPTY,
-                            small_text: EMPTY,
-                        };
-
-                        set_activity(&mut drpc, data).expect("Failed to set activity");
-
-                        set_end(&mut drpc, 0);
-
-                        if get_reset_single_player_timer() {
-                            reset_timer(&mut drpc);
-
-                            set_was_in_game(false);
-                            set_reset_single_player_timer(true);
-                        }
+                    data.details = if our_score == second_highest_score {
+                        format!("{} - {}", our_score, second_highest_score)
                     } else {
-                        let our_score = gamestate.our_score();
-                        let second_highest_score = gamestate.second_highest_score();
-                        let highest_score = gamestate.highest_score();
-                        let score_limit = serverinfo.score_limit();
-                        let endtime = serverinfo.end_time() as u64;
+                        format!("{} - {}", our_score, highest_score)
+                    };
 
-                        let mut details = if our_score == second_highest_score {
-                            format!("{} - {}", our_score, second_highest_score)
+                    data.details
+                        .push_str(&format!(" (First to {})", score_limit)[..]);
+                    if endtime > 0 {
+                        let start = SystemTime::now();
+                        let since_the_epoch = start.duration_since(UNIX_EPOCH).unwrap();
+
+                        data.end = Some(since_the_epoch.as_secs() + endtime);
+                        data.start = Some(0);
+                    }
+                    set_reset_single_player_timer(false);
+                }
+                set_was_in_game(true);
+            }
+
+            println!("setting the activity");
+            if let Err(err) = drpc.set_activity(|act| {
+                act.party(|party| party.size(data.party))
+                    .details(data.details)
+                    .state(data.state)
+                    .assets(|asset| {
+                        asset
+                            .large_image(data.large_image)
+                            .small_image(data.small_image)
+                            .large_text(data.large_text)
+                            .small_text(data.small_text)
+                    })
+                    .timestamps(|time| {
+                        let time = if data.end.is_some() {
+                            time.end(data.end.unwrap())
                         } else {
-                            format!("{} - {}", our_score, highest_score)
+                            time
                         };
 
-                        details.push_str(&format!(" (First to {})", score_limit)[..]);
-                        drpc.set_activity(|act| act.details(details))
-                            .expect("Failed to set activity");
-                        if endtime > 0 {
-                            let start = SystemTime::now();
-                            let since_the_epoch = start.duration_since(UNIX_EPOCH).unwrap();
-
-                            set_end(&mut drpc, since_the_epoch.as_secs() + endtime);
-                            set_start(&mut drpc, 0);
+                        if data.start.is_some() {
+                            time.start(data.start.unwrap())
+                        } else {
+                            time
                         }
-                        set_reset_single_player_timer(false);
-                    }
-                    set_was_in_game(true);
-                }
-
-                wait(10)
+                    })
+            }) {
+                #[cfg(debug_assertions)]
+                println!("coudln't set activity because of {:?}", err)
             }
+
+            println!("completed a cycle");
+            wait(100)
         }
     }
 }
 
 entry!(DiscordRpc);
 
-fn set_activity(drpc: &mut Client, data: ActivityData) -> Result<(), DiscordError> {
-    drpc.set_activity(|act| act.party(|party| party.size(data.party)))?;
-    drpc.set_activity(|act| act.details(data.details))?;
-    drpc.set_activity(|act| act.state(data.state))?;
-    drpc.set_activity(|act| act.assets(|asset| asset.large_image(data.large_image)))?;
-    drpc.set_activity(|act| act.assets(|asset| asset.large_text(data.large_text)))?;
-    drpc.set_activity(|act| act.assets(|asset| asset.small_image(data.small_image)))?;
-    drpc.set_activity(|act| act.assets(|asset| asset.small_text(data.small_text)))?;
-
-    Ok(())
-}
-
-fn set_end(drpc: &mut Client, t: u64) {
-    drpc.set_activity(|act| act.timestamps(|time| time.end(t)))
-        .expect("Failed to set activity");
-}
-
-fn set_start(drpc: &mut Client, t: u64) {
-    drpc.set_activity(|act| act.timestamps(|time| time.start(t)))
-        .expect("Failed to set activity");
-}
-
-fn reset_timer(drpc: &mut Client) {
+fn reset_timer(data: &mut ActivityData) {
     let start = SystemTime::now();
     let since_the_epoch = start.duration_since(UNIX_EPOCH).unwrap(); // there is no way this fails
 
     let in_ms =
         since_the_epoch.as_secs() * 1000 + since_the_epoch.subsec_nanos() as u64 / 1_000_000;
-    drpc.set_activity(|act| act.timestamps(|time| time.start(in_ms)))
-        .expect("Failed to set activity");
+
+    data.start = Some(in_ms);
 }
 
 fn get_was_in_game() -> bool {
