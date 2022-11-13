@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rrplug = "0.1.0"
-discord-presence = { git = "https://github.com/jewlexx/discord-presence" } # TODO: move this to a version when the activity blocking is fixed
+rrplug = "0.1.1"
+discord-presence = { git = "https://github.com/jewlexx/discord-presence", branch = "fix/sandbox" } # TODO: move this to a version when the activity blocking is fixed
 
 [build-dependencies]
 windres = "0.2.2"

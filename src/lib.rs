@@ -1,4 +1,4 @@
-use std::time::{SystemTime, UNIX_EPOCH};
+use std::{time::{SystemTime, UNIX_EPOCH}, sync::{Mutex, mpsc::{Receiver, channel}}};
 
 use discord_presence::Client;
 use rrplug::prelude::*;
@@ -23,6 +23,8 @@ struct ActivityData {
 struct DiscordRpc {
     gamestate: Option<GameState>,
     serverinfo: Option<ServerInfo>,
+    drpc: Option<Mutex<Client>>,
+    recv: Option<Receiver<bool>>
 }
 
 impl Plugin for DiscordRpc {
@@ -30,31 +32,54 @@ impl Plugin for DiscordRpc {
         Self {
             gamestate: None,
             serverinfo: None,
+            drpc: None,
+            recv: None
         }
     }
 
     fn initialize(&mut self, external_plugin_data: ExternalPluginData) {
         self.gamestate = external_plugin_data.get_game_state_struct();
         self.serverinfo = external_plugin_data.get_server_info_struct();
-        println!("discord rpc plugin initialized");
+        println!("[DiscordRPC] discord rpc plugin initialized");
+
+        let mut drpc = Client::new(941428101429231617);
+        
+        let _ = drpc.start();
+
+        let (send, recv) = channel::<bool>();
+        self.recv = Some(recv);
+        let send = Mutex::new(send);
+
+        // drpc.block_until_event(discord_presence::Event::Ready).unwrap(); // hmm doesn't work?
+
+        drpc.on_ready(move |_| send.lock().unwrap().send(true).unwrap());
+
+        self.drpc = Some(Mutex::new(drpc));
     }
 
     fn main(&self) {
         let gamestate = self.gamestate.as_ref().unwrap();
         let serverinfo = self.serverinfo.as_ref().unwrap();
-
-        let mut drpc = Client::new(941428101429231617);
-
-        let _ =drpc.start();
-        println!("discord rpc initialized");
+        let mut drpc = self.drpc.as_ref().unwrap().lock().unwrap();
+        let recv = self.recv.as_ref().unwrap();
+        
+        println!("[DiscordRPC] waiting for discord rpc to be ready");
+        loop {
+            if recv.try_recv().is_ok() {
+                println!("[DiscordRPC] discord rpc initialized");
+                break;
+            }
+            wait(1000)
+        }
 
         loop {
             if let Err(err) = drpc.clear_activity() {
                 #[cfg(debug_assertions)]
-                println!("coudln't clear activity because of {:?}", err)
+                println!("[DiscordRPC] coudln't clear activity because of {:?}", err)
             }
-
-            println!("started a cycle");
+            
+            #[cfg(debug_assertions)]
+            println!("[DiscordRPC] started a cycle");
 
             let playlist = gamestate.playlist();
             let playlist_display_name = gamestate.playlist_display_name();
@@ -150,7 +175,7 @@ impl Plugin for DiscordRpc {
                     let score_limit = serverinfo.score_limit();
                     let endtime = serverinfo.end_time() as u64;
 
-                    data.details = if our_score == second_highest_score {
+                    data.details = if our_score == highest_score {
                         format!("{} - {}", our_score, second_highest_score)
                     } else {
                         format!("{} - {}", our_score, highest_score)
@@ -170,7 +195,7 @@ impl Plugin for DiscordRpc {
                 set_was_in_game(true);
             }
 
-            println!("setting the activity");
+            println!("[DiscordRPC] setting the activity");
             if let Err(err) = drpc.set_activity(|act| {
                 act.party(|party| party.size(data.party))
                     .details(data.details)
@@ -197,10 +222,11 @@ impl Plugin for DiscordRpc {
                     })
             }) {
                 #[cfg(debug_assertions)]
-                println!("coudln't set activity because of {:?}", err)
+                println!("[DiscordRPC] coudln't set activity because of {:?}", err)
             }
-
-            println!("completed a cycle");
+            
+            #[cfg(debug_assertions)]
+            println!("[DiscordRPC] completed a cycle");
             wait(100)
         }
     }
