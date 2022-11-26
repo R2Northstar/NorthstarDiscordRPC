@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32228.430
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DiscordRPCV2", "DiscordRPCV2\DiscordRPCV2.vcxproj", "{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Debug|x64.ActiveCfg = Debug|x64
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Debug|x64.Build.0 = Debug|x64
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Debug|x86.ActiveCfg = Debug|Win32
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Debug|x86.Build.0 = Debug|Win32
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Release|x64.ActiveCfg = Release|x64
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Release|x64.Build.0 = Release|x64
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Release|x86.ActiveCfg = Release|Win32
+		{FEEB6B7A-DCF9-4D5D-8029-79D846996DFD}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {150B09A8-0DD9-48C0-BCCC-55C0323A9D24}
+	EndGlobalSection
+EndGlobal

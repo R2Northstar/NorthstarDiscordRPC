@@ -1,0 +1,485 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\discord">
+      <UniqueIdentifier>{1c671b71-b51a-4ba9-8e4c-16c48e8c3b4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\discord">
+      <UniqueIdentifier>{023f3bdd-44ff-4b34-84a3-7d2950994958}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\PluginLibrary">
+      <UniqueIdentifier>{47648f29-e68b-4f62-ad99-6ae8be3b250d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PluginLibrary">
+      <UniqueIdentifier>{82af384c-ec47-4a69-ac2b-009b0daa09ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include">
+      <UniqueIdentifier>{66cf95ab-bebf-4b5f-bd0c-500dd8a16bf5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\spdlog">
+      <UniqueIdentifier>{8961e7cd-6942-4dfa-86f8-39bb72789433}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\spdlog\cfg">
+      <UniqueIdentifier>{d9c29508-53dd-42d0-9913-65847b1c0916}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\spdlog\details">
+      <UniqueIdentifier>{e4b61d1f-87f3-4152-a8af-e3ab4ef5b9c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\spdlog\fmt">
+      <UniqueIdentifier>{f62e126a-90f9-4871-9662-46a7569d8483}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\spdlog\fmt\bundled">
+      <UniqueIdentifier>{1337e3c8-ad4d-4755-9413-2da47973c065}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\include\spdlog\sinks">
+      <UniqueIdentifier>{6292e636-1be0-4bc9-88a0-42f06c213b0b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="plugin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\achievement_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\activity_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\application_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\core.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\image_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\lobby_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\network_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\overlay_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\relationship_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\storage_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\store_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\types.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\user_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib_discord\voice_manager.cpp">
+      <Filter>Source Files\discord</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\lib.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\loader.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\squirrel.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
+    </ClCompile>
+    <ClCompile Include="include\base64.cpp">
+      <Filter>Header Files\include</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="dllmain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="plugin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\achievement_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\activity_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\application_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\core.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\discord.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\event.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\ffi.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\image_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\lobby_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\network_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\overlay_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\relationship_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\storage_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\store_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\types.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\user_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib_discord\voice_manager.h">
+      <Filter>Header Files\discord</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\lib.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\util.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\loader.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\plugin_abi.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\squirrelclasstypes.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\logging.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\squirrel.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\squirreldatatypes.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\vector.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\async.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\async_logger.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\async_logger-inl.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\common.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\common-inl.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\formatter.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fwd.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\logger.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\logger-inl.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\pattern_formatter.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\pattern_formatter-inl.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\spdlog.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\spdlog-inl.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\stopwatch.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\tweakme.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\version.h">
+      <Filter>Header Files\include\spdlog</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\argv.h">
+      <Filter>Header Files\include\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\env.h">
+      <Filter>Header Files\include\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\helpers.h">
+      <Filter>Header Files\include\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\cfg\helpers-inl.h">
+      <Filter>Header Files\include\spdlog\cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\backtracer.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\backtracer-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\circular_q.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\console_globals.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\file_helper.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\file_helper-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\fmt_helper.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg_buffer.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg_buffer-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\log_msg-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\mpmc_blocking_q.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\null_mutex.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\os.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\os-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\periodic_worker.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\periodic_worker-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\registry.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\registry-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\synchronous_factory.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\tcp_client.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\tcp_client-windows.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\thread_pool.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\thread_pool-inl.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\details\windows_include.h">
+      <Filter>Header Files\include\spdlog\details</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bin_to_hex.h">
+      <Filter>Header Files\include\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\chrono.h">
+      <Filter>Header Files\include\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\fmt.h">
+      <Filter>Header Files\include\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\ostr.h">
+      <Filter>Header Files\include\spdlog\fmt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\chrono.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\color.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\compile.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\core.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\format.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\format-inl.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\locale.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\os.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\ostream.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\posix.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\printf.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\fmt\bundled\ranges.h">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\android_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ansicolor_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ansicolor_sink-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\base_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\base_sink-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\basic_file_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\basic_file_sink-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\daily_file_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\dist_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\dup_filter_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\hourly_file_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\msvc_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\null_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ostream_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\ringbuffer_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\rotating_file_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\rotating_file_sink-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\sink-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_color_sinks.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_color_sinks-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_sinks.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\stdout_sinks-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\syslog_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\systemd_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\tcp_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\win_eventlog_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\wincolor_sink.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="include\spdlog\sinks\wincolor_sink-inl.h">
+      <Filter>Header Files\include\spdlog\sinks</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\base64.h">
+      <Filter>Header Files\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="manifest.json" />
+    <None Include="include\spdlog\fmt\bundled\LICENSE.rst">
+      <Filter>Header Files\include\spdlog\fmt\bundled</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
