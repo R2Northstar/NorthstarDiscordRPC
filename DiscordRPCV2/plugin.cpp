@@ -24,8 +24,8 @@ void* (*getPluginData)(PluginObject);
 bool wasInGame;
 bool resetSinglePlayerTimer = true;
 
-ConVar* Cvar_ns_presence_allow_join;
-ConVar* Cvar_ns_presence_include_password;
+ConVar* Cvar_ns_discord_allow_join;
+ConVar* Cvar_ns_discord_include_password;
 
 struct DiscordState {
 	discord::User currentUser;
@@ -200,12 +200,12 @@ int PluginLoop()
 						std::string invite = fmt::format("northstar://{}@{}", "server", g_pPlugin->presence->id);
 						activity.GetSecrets().SetJoin(invite.c_str());
 					}
-					else if (Cvar_ns_presence_include_password != nullptr && Cvar_ns_presence_include_password->GetBool()) {
+					else if (Cvar_ns_discord_include_password != nullptr && Cvar_ns_discord_include_password->GetBool()) {
 						std::string invite = fmt::format("northstar://{}@{}:{}", "server", g_pPlugin->presence->id, base64_encode(g_pPlugin->presence->password));
 						activity.GetSecrets().SetJoin(invite.c_str());
 					}
 
-					if (Cvar_ns_presence_allow_join && Cvar_ns_presence_allow_join->GetBool())
+					if (Cvar_ns_discord_allow_join && Cvar_ns_discord_allow_join->GetBool())
 						activity.GetParty().SetPrivacy(discord::ActivityPartyPrivacy::Public);
 					else
 						activity.GetParty().SetPrivacy(discord::ActivityPartyPrivacy::Private);
@@ -232,8 +232,8 @@ void Plugin::Main() {
 }
 
 void Plugin::DLLLoadEngine() {
-	Cvar_ns_presence_allow_join = new ConVar("ns_presence_allow_join", "0", FCVAR_ARCHIVE, "test 123");
-	Cvar_ns_presence_include_password = new ConVar("ns_presence_include_password", "0", FCVAR_ARCHIVE, "test 123");
+	Cvar_ns_discord_allow_join = new ConVar("ns_discord_allow_join", "0", FCVAR_ARCHIVE, "test 123");
+	Cvar_ns_discord_include_password = new ConVar("ns_discord_include_password", "0", FCVAR_ARCHIVE, "test 123");
 }
 void Plugin::DLLLoadClient() {}
 void Plugin::DLLLoadServer() {}
