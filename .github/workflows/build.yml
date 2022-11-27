@@ -21,7 +21,7 @@ jobs:
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: RePak-${{ steps.extract.outputs.commit }}
+          name: NorthstarDiscordRPC-${{ steps.extract.outputs.commit }}
           path: |
             x64/${{ env.BUILD_PROFILE }}/*.dll
             x64/${{ env.BUILD_PROFILE }}/*.exe
