@@ -132,7 +132,7 @@ template <ScriptContext context> void SquirrelManager<context>::ExecuteCode(cons
 	if (compileResult != SQRESULT_ERROR)
 	{
 		pushroottable(m_pSQVM->sqvm);
-		SQRESULT callResult = call(m_pSQVM->sqvm, 0);
+		SQRESULT callResult = _call(m_pSQVM->sqvm, 0);
 		spdlog::info("sq_call returned {}", PrintSQRESULT.at(callResult));
 	}
 }
@@ -184,14 +184,6 @@ template <size_t N> struct TemplateStringLiteral
 	char value[N];
 };
 
-template <ScriptContext context> 
-SQRESULT SQ_Test(HSquirrelVM* sqvm) 
-{
-	g_pPlugin->RequestGameStateData();
-	return SQRESULT_NOTNULL;
-};
-
-
 void InitializeSquirrelVM_CLIENT(SquirrelFunctions* funcs)
 {
 	g_pSquirrel<ScriptContext::CLIENT> = new SquirrelManager<ScriptContext::CLIENT>;
@@ -224,7 +216,7 @@ void InitializeSquirrelVM_CLIENT(SquirrelFunctions* funcs)
 	g_pSquirrel<ScriptContext::CLIENT>->__sq_pushbool = funcs->__sq_pushbool;
 	g_pSquirrel<ScriptContext::CLIENT>->__sq_pushasset = funcs->__sq_pushasset;
 	g_pSquirrel<ScriptContext::CLIENT>->__sq_pushvector = funcs->__sq_pushvector;
-	g_pSquirrel<ScriptContext::CLIENT>->__sq_pushSQObject = funcs->__sq_pushSQObject;
+	g_pSquirrel<ScriptContext::CLIENT>->__sq_pushobject = funcs->__sq_pushobject;
 	g_pSquirrel<ScriptContext::CLIENT>->__sq_raiseerror = funcs->__sq_raiseerror;
 	g_pSquirrel<ScriptContext::UI>->__sq_pushstring = g_pSquirrel<ScriptContext::CLIENT>->__sq_pushstring;
 	g_pSquirrel<ScriptContext::UI>->__sq_pushinteger = g_pSquirrel<ScriptContext::CLIENT>->__sq_pushinteger;
@@ -232,7 +224,7 @@ void InitializeSquirrelVM_CLIENT(SquirrelFunctions* funcs)
 	g_pSquirrel<ScriptContext::UI>->__sq_pushbool = g_pSquirrel<ScriptContext::CLIENT>->__sq_pushbool;
 	g_pSquirrel<ScriptContext::UI>->__sq_pushvector = g_pSquirrel<ScriptContext::CLIENT>->__sq_pushvector;
 	g_pSquirrel<ScriptContext::UI>->__sq_pushasset = g_pSquirrel<ScriptContext::CLIENT>->__sq_pushasset;
-	g_pSquirrel<ScriptContext::UI>->__sq_pushSQObject = g_pSquirrel<ScriptContext::CLIENT>->__sq_pushSQObject;
+	g_pSquirrel<ScriptContext::UI>->__sq_pushobject = g_pSquirrel<ScriptContext::CLIENT>->__sq_pushobject;
 	g_pSquirrel<ScriptContext::UI>->__sq_raiseerror = g_pSquirrel<ScriptContext::CLIENT>->__sq_raiseerror;
 
 	g_pSquirrel<ScriptContext::CLIENT>->__sq_getstring = funcs->__sq_getstring;
@@ -260,8 +252,8 @@ void InitializeSquirrelVM_CLIENT(SquirrelFunctions* funcs)
 
 	// Message buffer stuff
 	g_pSquirrel<ScriptContext::UI>->messageBuffer = g_pSquirrel<ScriptContext::CLIENT>->messageBuffer;
-	g_pSquirrel<ScriptContext::CLIENT>->__sq_getSquirrelFunction = funcs->__sq_getSquirrelFunction;
-	g_pSquirrel<ScriptContext::UI>->__sq_getSquirrelFunction = g_pSquirrel<ScriptContext::CLIENT>->__sq_getSquirrelFunction;
+	g_pSquirrel<ScriptContext::CLIENT>->__sq_getfunction = funcs->__sq_getfunction;
+	g_pSquirrel<ScriptContext::UI>->__sq_getfunction = g_pSquirrel<ScriptContext::CLIENT>->__sq_getfunction;
 
 	g_pSquirrel<ScriptContext::CLIENT>->RegisterSquirrelFunc = funcs->RegisterSquirrelFunc;
 	g_pSquirrel<ScriptContext::UI>->RegisterSquirrelFunc = funcs->RegisterSquirrelFunc;
@@ -269,7 +261,11 @@ void InitializeSquirrelVM_CLIENT(SquirrelFunctions* funcs)
 	g_pSquirrel<ScriptContext::CLIENT>->__sq_schedule_call_external = funcs->__sq_schedule_call_external;
 	g_pSquirrel<ScriptContext::UI>->__sq_schedule_call_external = funcs->__sq_schedule_call_external;
 
-	g_pSquirrel<ScriptContext::CLIENT>->AddFuncRegistration("void", "plget", "", "", SQ_Test<ScriptContext::CLIENT>);
+	for (auto& autoBindFunc : g_pSqAutoBindContainer->clientSqAutoBindFuncs)
+	{
+		autoBindFunc();
+	}
+
 }
 
 void InitializeSquirrelVM_SERVER(SquirrelFunctions * funcs)
@@ -294,7 +290,7 @@ void InitializeSquirrelVM_SERVER(SquirrelFunctions * funcs)
 	g_pSquirrel<ScriptContext::SERVER>->__sq_pushbool = funcs->__sq_pushbool;
 	g_pSquirrel<ScriptContext::SERVER>->__sq_pushasset = funcs->__sq_pushasset;
 	g_pSquirrel<ScriptContext::SERVER>->__sq_pushvector = funcs->__sq_pushvector;
-	g_pSquirrel<ScriptContext::SERVER>->__sq_pushSQObject = funcs->__sq_pushSQObject;
+	g_pSquirrel<ScriptContext::SERVER>->__sq_pushobject = funcs->__sq_pushobject;
 
 	g_pSquirrel<ScriptContext::SERVER>->__sq_raiseerror = funcs->__sq_raiseerror;
 
@@ -311,11 +307,16 @@ void InitializeSquirrelVM_SERVER(SquirrelFunctions * funcs)
 	g_pSquirrel<ScriptContext::SERVER>->__sq_setuserdatatypeid = funcs->__sq_setuserdatatypeid;
 
 	// Message buffer stuff
-	g_pSquirrel<ScriptContext::SERVER>->__sq_getSquirrelFunction = funcs->__sq_getSquirrelFunction;
+	g_pSquirrel<ScriptContext::SERVER>->__sq_getfunction = funcs->__sq_getfunction;
 
 	g_pSquirrel<ScriptContext::SERVER>->RegisterSquirrelFunc = funcs->RegisterSquirrelFunc;
 
 	g_pSquirrel<ScriptContext::SERVER>->__sq_schedule_call_external = funcs->__sq_schedule_call_external;
+
+	for (auto& autoBindFunc : g_pSqAutoBindContainer->serverSqAutoBindFuncs)
+	{
+		autoBindFunc();
+	}
 }
 
 template <ScriptContext context> void unwind_message(HSquirrelVM* sqvm) {

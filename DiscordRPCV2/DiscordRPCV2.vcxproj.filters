@@ -46,6 +46,9 @@
     <Filter Include="Header Files\include\spdlog\sinks">
       <UniqueIdentifier>{6292e636-1be0-4bc9-88a0-42f06c213b0b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\include">
+      <UniqueIdentifier>{1113d7f8-27a5-469e-82b2-2cb9be3886ce}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -96,7 +99,7 @@
     <ClCompile Include="lib_discord\voice_manager.cpp">
       <Filter>Source Files\discord</Filter>
     </ClCompile>
-    <ClCompile Include="lib\lib.cpp">
+    <ClCompile Include="lib\plugin_lib.cpp">
       <Filter>Source Files\PluginLibrary</Filter>
     </ClCompile>
     <ClCompile Include="lib\loader.cpp">
@@ -105,8 +108,23 @@
     <ClCompile Include="lib\squirrel.cpp">
       <Filter>Source Files\PluginLibrary</Filter>
     </ClCompile>
+    <ClCompile Include="lib\squirrelautobind.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
+    </ClCompile>
     <ClCompile Include="include\base64.cpp">
-      <Filter>Header Files\include</Filter>
+      <Filter>Source Files\include</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\concommand.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\convar.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\color.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\bits.cpp">
+      <Filter>Source Files\PluginLibrary</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -467,8 +485,29 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="lib\squirrelautobind.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
     <ClInclude Include="include\base64.h">
       <Filter>Header Files\include</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\concommand.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\convar.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\cvar.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\color.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\sourceinterface.h">
+      <Filter>Header Files\PluginLibrary</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\bits.h">
+      <Filter>Header Files\PluginLibrary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -116,7 +116,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Z:\tf2dev\DiscordRPCV2\DiscordRPCV2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -134,7 +134,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>Z:\tf2dev\DiscordRPCV2\DiscordRPCV2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -149,9 +149,14 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="include\base64.cpp" />
+    <ClCompile Include="lib\bits.cpp" />
+    <ClCompile Include="lib\color.cpp" />
+    <ClCompile Include="lib\concommand.cpp" />
+    <ClCompile Include="lib\convar.cpp" />
     <ClCompile Include="lib\loader.cpp" />
-    <ClCompile Include="lib\lib.cpp" />
+    <ClCompile Include="lib\plugin_lib.cpp" />
     <ClCompile Include="lib\squirrel.cpp" />
+    <ClCompile Include="lib\squirrelautobind.cpp" />
     <ClCompile Include="lib_discord\achievement_manager.cpp" />
     <ClCompile Include="lib_discord\activity_manager.cpp" />
     <ClCompile Include="lib_discord\application_manager.cpp" />
@@ -261,11 +266,18 @@
     <ClInclude Include="include\spdlog\stopwatch.h" />
     <ClInclude Include="include\spdlog\tweakme.h" />
     <ClInclude Include="include\spdlog\version.h" />
+    <ClInclude Include="lib\bits.h" />
+    <ClInclude Include="lib\color.h" />
+    <ClInclude Include="lib\concommand.h" />
+    <ClInclude Include="lib\convar.h" />
+    <ClInclude Include="lib\cvar.h" />
     <ClInclude Include="lib\loader.h" />
     <ClInclude Include="lib\logging.h" />
     <ClInclude Include="lib\lib.h" />
     <ClInclude Include="lib\plugin_abi.h" />
+    <ClInclude Include="lib\sourceinterface.h" />
     <ClInclude Include="lib\squirrel.h" />
+    <ClInclude Include="lib\squirrelautobind.h" />
     <ClInclude Include="lib\squirrelclasstypes.h" />
     <ClInclude Include="lib\squirreldatatypes.h" />
     <ClInclude Include="lib\util.h" />

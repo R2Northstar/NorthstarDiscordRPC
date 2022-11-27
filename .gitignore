@@ -348,3 +348,8 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+.vs/DiscordRPCV2/v17/Browse.VC.db
+.vs/DiscordRPCV2/v17/ipch/AutoPCH/e265453b61c59a4c/LOADER.ipch
+.vs/DiscordRPCV2/v17/Browse.VC.db
+*.ipch
+*.db

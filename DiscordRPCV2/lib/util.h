@@ -2,29 +2,31 @@
 
 #include <shared_mutex>
 
-class ServerDataClass {
+class GameStatePresenceClass
+ {
 	public:
 		std::string id;
 		std::string name;
 		std::string description;
-		std::string password;
+		std::string password; // NOTE: May be empty
 
-		bool isLocal;
-};
+		bool is_server;
+		bool is_local;
+		GameState state;
 
-class GameStateDataClass {
-	public:
 		std::string map;
-		std::string mapDisplayname;
+		std::string map_displayname;
 		std::string playlist;
-		std::string playlistDisplayName;
+		std::string playlist_displayname;
 
-		int currentPlayers;
-		int maxPlayers;
+		int current_players;
+		int max_players;
 
-		int ownScore;
-		int otherHighestScore;
-		int maxScore;
+		int own_score;
+		int other_highest_score; // NOTE: The highest score OR the second highest score if we have the highest
+		int max_score;
 
-		int timestamp;
+		int timestamp_end;
+
+		std::shared_mutex mutex;
 };

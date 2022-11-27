@@ -1,11 +1,15 @@
 #pragma once
 #include "../pch.h"
 #include "squirreldatatypes.h"
+
 #include <map>
 #include <vector>
 #include <functional>
 #include <mutex>
 #include <optional>
+
+
+#include <queue>
 
 enum SQRESULT : SQInteger
 {
@@ -125,17 +129,17 @@ typedef void (*sq_schedule_call_externalType)(ScriptContext context, const char*
 class SquirrelMessage
 {
   public:
-	std::string function_name;
+	std::string functionName;
 	FunctionVector args;
-	bool is_external = false;
-	SquirrelMessage_External_Pop external_func = NULL;
+	bool isExternal = false;
+	SquirrelMessage_External_Pop externalFunc = NULL;
 };
 
 class SquirrelMessageBuffer
 {
 
   private:
-	std::vector<SquirrelMessage> messages = {};
+	std::queue<SquirrelMessage> messages = {};
 
   public:
 	std::mutex mutex;
@@ -144,8 +148,8 @@ class SquirrelMessageBuffer
 		std::lock_guard<std::mutex> guard(mutex);
 		if (!messages.empty())
 		{
-			auto message = messages.back();
-			messages.pop_back();
+			auto message = messages.front();
+			messages.pop();
 			return message;
 		}
 		else
@@ -156,13 +160,13 @@ class SquirrelMessageBuffer
 
 	void unwind()
 	{
-		auto maybe_message = this->pop();
-		if (!maybe_message)
-		{ 
+		auto maybeMessage = this->pop();
+		if (!maybeMessage)
+		{
 			spdlog::error("Plugin tried consuming SquirrelMessage while buffer was empty");
 			return;
 		}
-		auto message = maybe_message.value();
+		auto message = maybeMessage.value();
 		for (auto& v : message.args)
 		{
 			// Execute lambda to push arg to stack
@@ -173,17 +177,17 @@ class SquirrelMessageBuffer
 	void push(SquirrelMessage message)
 	{
 		std::lock_guard<std::mutex> guard(mutex);
-		messages.push_back(message);
+		messages.push(message);
 	}
 };
 
+// Super simple wrapper class to allow pushing Assets via call
 class SquirrelAsset
 {
   public:
 	std::string path;
 	SquirrelAsset(std::string path) : path(path) {};
 };
-
 
 #pragma region TypeDefs
 
@@ -212,7 +216,7 @@ typedef void (*sq_pushfloatType)(HSquirrelVM* sqvm, SQFloat f);
 typedef void (*sq_pushboolType)(HSquirrelVM* sqvm, SQBool b);
 typedef void (*sq_pushassetType)(HSquirrelVM* sqvm, const SQChar* str, SQInteger iLength);
 typedef void (*sq_pushvectorType)(HSquirrelVM* sqvm, const SQFloat* pVec);
-typedef void (*sq_pushSQObjectType)(HSquirrelVM* sqvm, SQObject* pVec);
+typedef void (*sq_pushobjectType)(HSquirrelVM* sqvm, SQObject* pVec);
 
 // sq stack get funcs
 typedef const SQChar* (*sq_getstringType)(HSquirrelVM* sqvm, SQInteger iStackpos);
@@ -223,12 +227,18 @@ typedef SQRESULT (*sq_getType)(HSquirrelVM* sqvm, SQInteger iStackpos);
 typedef SQRESULT (*sq_getassetType)(HSquirrelVM* sqvm, SQInteger iStackpos, const char** pResult);
 typedef SQRESULT (*sq_getuserdataType)(HSquirrelVM* sqvm, SQInteger iStackpos, void** pData, uint64_t* pTypeId);
 typedef SQFloat* (*sq_getvectorType)(HSquirrelVM* sqvm, SQInteger iStackpos);
+typedef SQBool (*sq_getthisentityType)(HSquirrelVM*, void** ppEntity);
+typedef void (*sq_getobjectType)(HSquirrelVM*, SQInteger iStackPos, SQObject* pOutObj);
 
 // sq stack userpointer funcs
 typedef void* (*sq_createuserdataType)(HSquirrelVM* sqvm, SQInteger iSize);
 typedef SQRESULT (*sq_setuserdatatypeidType)(HSquirrelVM* sqvm, SQInteger iStackpos, uint64_t iTypeId);
 
-typedef int (*sq_getSquirrelFunctionType)(HSquirrelVM* sqvm, const char* name, SQObject* returnObj, const char* signature);
+// sq misc entity funcs
+typedef void* (*sq_getentityfrominstanceType)(CSquirrelVM* sqvm, SQObject* pInstance, char** ppEntityConstant);
+typedef char** (*sq_GetEntityConstantType)();
+
+typedef int (*sq_getfunctionType)(HSquirrelVM* sqvm, const char* name, SQObject* returnObj, const char* signature);
 
 #pragma endregion
 

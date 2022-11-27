@@ -17,6 +17,22 @@ enum PluginObject
 	DUMMY = 0xFFFF
 };
 
+enum GameState
+{
+	LOADING = 0,
+	MAINMENU = 1,
+	LOBBY = 2,
+	INGAME = 3
+};
+
+
+enum PluginLoadDLL
+{
+	ENGINE = 0,
+	CLIENT,
+	SERVER
+};
+
 struct SquirrelFunctions
 {
 	RegisterSquirrelFuncType RegisterSquirrelFunc;
@@ -72,19 +88,32 @@ struct LogMsg
 	uint64_t timestamp;
 	const char* msg;
 	MessageSource source;
+	int pluginHandle;
 };
 
 typedef void (*loggerfunc_t)(LogMsg* msg);
+typedef void (*PLUGIN_RELAY_INVITE_TYPE)(const char* invite);
 
 struct PluginNorthstarData
 {
 	const char* version;
 	HMODULE northstarModule;
+	int pluginHandle;
 };
 
 struct PluginInitFuncs
 {
 	loggerfunc_t logger;
+	PLUGIN_RELAY_INVITE_TYPE relayInviteFunc;
+};
+
+struct PluginEngineData
+{
+	void* ConCommandConstructor;
+	void* conVarMalloc;
+	void* conVarRegister;
+	void* ConVar_Vtable;
+	void* IConVar_Vtable;
 };
 
 struct PluginGameStatePresence
@@ -96,8 +125,7 @@ struct PluginGameStatePresence
 
 	bool is_server;
 	bool is_local;
-	bool is_loading;
-	bool is_main_menu;
+	GameState state;
 
 	const char* map;
 	const char* map_displayname;
@@ -112,7 +140,6 @@ struct PluginGameStatePresence
 	int max_score;
 
 	int timestamp_end;
-
 };
 
 /// <summary> Async communication within the plugin system
@@ -138,5 +165,4 @@ typedef void (*PLUGIN_INFORM_SQVM_DESTROYED_TYPE)(ScriptContext context);
 
 // Northstar -> Plugin
 typedef void (*PLUGIN_PUSH_PRESENCE_TYPE)(PluginGameStatePresence* data);
-
-typedef void (*PLUGIN_RELAY_INVITE)(const char* invite);
+typedef void (*PLUGIN_INFORM_DLL_LOAD_TYPE)(PluginLoadDLL dll, void* data);

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <functional>
 
 typedef void (*SqAutoBindFunc)();
 
@@ -74,3 +75,4 @@ class __squirrelautobind
 		g_pSqAutoBindContainer->serverSqAutoBindFuncs.push_back(serverAutoBindFunc);
 	}
 };
+
