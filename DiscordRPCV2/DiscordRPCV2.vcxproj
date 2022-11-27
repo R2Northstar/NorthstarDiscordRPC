@@ -123,7 +123,6 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>Z:\tf2dev\Titanfall2\R2Northstar\plugins\DiscordRPCV2.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -143,7 +142,6 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>discord_game_sdk.dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>Z:\tf2dev\Titanfall2\R2Northstar\plugins\DiscordRPCV2.dll</OutputFile>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
