@@ -19,8 +19,6 @@
 
 #include "pch.h"
 
-void* (*getPluginData)(PluginObject);
-
 bool wasInGame;
 bool resetSinglePlayerTimer = true;
 
