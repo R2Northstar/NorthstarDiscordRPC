@@ -13,7 +13,6 @@
 
 void PLUGIN_INIT(PluginInitFuncs* funcs, PluginNorthstarData* data) {
 	g_pPlugin = new Plugin;
-	g_pSqAutoBindContainer = new SquirrelAutoBindContainer();
 	g_pPlugin->logger = (logger_t)funcs->logger;
 	spdlog::default_logger()->sinks().pop_back();
 	spdlog::default_logger()->sinks().push_back(std::make_shared<my_sink>());
@@ -74,10 +73,24 @@ void LoadDLLEngine(PluginEngineData* data) {
 	g_pPlugin->DLLLoadEngine();
 }
 
+void LoadDLLClient() {
+	g_pPlugin->DLLLoadClient();
+}
+
+void LoadDLLServer() {
+	g_pPlugin->DLLLoadServer();
+}
+
 void PLUGIN_INFORM_DLL_LOAD(PluginLoadDLL dll, void* data) {
 	switch (dll) {
 		case PluginLoadDLL::ENGINE:
 			LoadDLLEngine(static_cast<PluginEngineData*>(data));
+			break;
+		case PluginLoadDLL::CLIENT:
+			LoadDLLClient();
+			break;
+		case PluginLoadDLL::SERVER:
+			LoadDLLServer();
 			break;
 		default:
 			spdlog::warn("PLUGIN_INFORM_SQVM_DESTROYED called with unknown PluginLoadDLL type {}", dll);

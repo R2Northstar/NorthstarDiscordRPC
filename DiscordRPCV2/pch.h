@@ -10,6 +10,13 @@
 
 #include "lib/convar.h"
 
+#define __CONCAT3(x, y, z) x##y##z
+#define CONCAT3(x, y, z) __CONCAT3(x, y, z)
+#define __CONCAT2(x, y) x##y
+#define CONCAT2(x, y) __CONCAT2(x, y)
+#define __STR(s) #s
+
+
 template <typename ReturnType, typename... Args> ReturnType CallVFunc(int index, void* thisPtr, Args... args)
 {
 	return (*reinterpret_cast<ReturnType(__fastcall***)(void*, Args...)>(thisPtr))[index](thisPtr, args...);

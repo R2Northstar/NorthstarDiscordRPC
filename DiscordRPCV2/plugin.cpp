@@ -16,6 +16,7 @@
 #include <random>
 
 #include "lib_discord/discord.h"
+#include "lib/squirrel.h"
 
 #include "pch.h"
 
@@ -223,7 +224,6 @@ int PluginLoop()
 	return 0;
 }
 
-
 void Plugin::Main() {
 	std::thread discord(PluginLoop);
 	discord.detach();
@@ -233,5 +233,6 @@ void Plugin::DLLLoadEngine() {
 	Cvar_ns_discord_allow_join = new ConVar("ns_discord_allow_join", "0", FCVAR_ARCHIVE, "test 123");
 	Cvar_ns_discord_include_password = new ConVar("ns_discord_include_password", "0", FCVAR_ARCHIVE, "test 123");
 }
+
 void Plugin::DLLLoadClient() {}
 void Plugin::DLLLoadServer() {}

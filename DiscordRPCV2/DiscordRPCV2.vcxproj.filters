@@ -126,6 +126,9 @@
     <ClCompile Include="lib\bits.cpp">
       <Filter>Source Files\PluginLibrary</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="dllmain.h">

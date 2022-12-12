@@ -353,3 +353,4 @@ MigrationBackup/
 .vs/DiscordRPCV2/v17/Browse.VC.db
 *.ipch
 *.db
+*.hint
