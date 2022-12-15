@@ -261,11 +261,9 @@ void InitializeSquirrelVM_CLIENT(SquirrelFunctions* funcs)
 	g_pSquirrel<ScriptContext::CLIENT>->__sq_schedule_call_external = funcs->__sq_schedule_call_external;
 	g_pSquirrel<ScriptContext::UI>->__sq_schedule_call_external = funcs->__sq_schedule_call_external;
 
-	for (auto& autoBindFunc : g_pSqAutoBindContainer->clientSqAutoBindFuncs)
-	{
-		autoBindFunc();
-	}
-
+	if (g_pSqAutoBindContainer)
+		for (auto& autoBindFunc : g_pSqAutoBindContainer->clientSqAutoBindFuncs)
+			autoBindFunc();
 }
 
 void InitializeSquirrelVM_SERVER(SquirrelFunctions * funcs)
@@ -313,10 +311,9 @@ void InitializeSquirrelVM_SERVER(SquirrelFunctions * funcs)
 
 	g_pSquirrel<ScriptContext::SERVER>->__sq_schedule_call_external = funcs->__sq_schedule_call_external;
 
-	for (auto& autoBindFunc : g_pSqAutoBindContainer->serverSqAutoBindFuncs)
-	{
-		autoBindFunc();
-	}
+	if (g_pSqAutoBindContainer)
+		for (auto& autoBindFunc : g_pSqAutoBindContainer->serverSqAutoBindFuncs)
+			autoBindFunc();
 }
 
 template <ScriptContext context> void unwind_message(HSquirrelVM* sqvm) {

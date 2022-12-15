@@ -8,6 +8,7 @@ Plugin* g_pPlugin;
 
 void Plugin::Init(PluginInitFuncs* funcs, PluginNorthstarData* data) 
 {
+	handle = data->pluginHandle;
 	presence = new GameStatePresenceClass();
 	presence->state = GameState::LOADING;
 	_RelayInvite = funcs->relayInviteFunc;
