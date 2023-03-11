@@ -88,17 +88,19 @@ impl Plugin for DiscordRpc {
                 |_, result| {
                     if let Err(err) = result {
                         #[cfg(debug_assertions)]
-                        log::error!("coudln't update activity because of {:?}", err)
+                        log::error!("coudln't update activity because of {err:?}");
+                        #[cfg(not(debug_assertions))]
+                        drop(err)
                     }
                 },
             );
-
+            
+            #[cfg(debug_assertions)] // if the user turns off discord the console would be spammed 
             if let Err(err) = drpc.run_callbacks() {
-                #[cfg(debug_assertions)]
                 log::error!("failed to run callbacks {err}");
-                #[cfg(not(debug_assertions))]
-                drop(err)
             }
+            #[cfg(not(debug_assertions))]
+            log::error!("failed to run callbacks");
 
             wait(1000)
         }
@@ -164,6 +166,8 @@ impl Plugin for DiscordRpc {
                 activity.state = map_displayname.clone();
                 activity.large_image = presence.get_map();
                 activity.large_text = map_displayname;
+                activity.small_image = "northstar".to_string();
+                activity.small_text = "Titanfall 2 + Northstar".to_string();
                 if presence.get_playlist() == "campaign" {
                     activity.party = (0, 0);
                     activity.end = 0;

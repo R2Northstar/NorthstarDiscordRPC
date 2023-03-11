@@ -14,4 +14,5 @@ discord_game_sdk = "1.0.1"
 windres = "0.2.2"
 
 [lib]
+# name = "DiscordRPCV" # not if we really need this also ignore non snake case should be added to lib.rs then
 crate-type = ["cdylib"]
