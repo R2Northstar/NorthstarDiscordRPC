@@ -9,7 +9,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Build
         run: | 
-          $Env:DISCORD_GAME_SDK_PATH = "$GITHUB_WORKSPACE/discord_game_sdk"
+          $Env:DISCORD_GAME_SDK_PATH = "${{ github.workspace }}/discord_game_sdk"
           $Env:CARGO_BIN_NAME = "DiscordRPCV"
           cargo build --release --verbose
       - name: Extract Short Commit Hash
