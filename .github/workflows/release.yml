@@ -21,7 +21,7 @@ jobs:
       - name: Build
         run: |
           msbuild /p:Configuration=Release
-      - name: Upload launcher build as artifact
+      - name: Upload RPC build as artifact
         uses: actions/upload-artifact@v3
         with:
           name: northstar-discord-rpc
@@ -41,7 +41,7 @@ jobs:
     needs: build
     runs-on: ubuntu-22.04
     steps:
-      - name: Download compiled launcher
+      - name: Download compiled RPC
         uses: actions/download-artifact@v3
         with:
           name: northstar-discord-rpc
