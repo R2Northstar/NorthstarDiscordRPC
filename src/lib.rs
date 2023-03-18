@@ -3,11 +3,17 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use discord_game_sdk::{Activity, Discord, EventHandler};
+use discord_sdk::{
+    activity::{ActivityBuilder, Assets},
+    user::User,
+    wheel::UserState,
+    wheel::Wheel,
+    Discord, DiscordApp, Subscriptions,
+};
 use rrplug::prelude::*;
 use rrplug::wrappers::presence::{GamePresence, GameStateEnum};
+use tokio::runtime::Runtime;
 
-const EMPTY: String = String::new();
 const APP_ID: i64 = 941428101429231617;
 
 #[derive(Debug, Default, Clone)]
@@ -15,12 +21,18 @@ struct ActivityData {
     party: (u32, u32),
     details: String,
     state: String,
-    large_image: String,
-    large_text: String,
-    small_image: String,
-    small_text: String,
+    large_image: Option<String>,
+    large_text: Option<String>,
+    small_image: Option<String>,
+    small_text: Option<String>,
     end: i64,
     start: i64,
+}
+
+pub struct Client {
+    pub discord: Discord,
+    pub user: User,
+    pub wheel: Wheel,
 }
 
 #[derive(Debug)]
@@ -35,74 +47,21 @@ impl Plugin for DiscordRpc {
 
     fn initialize(&mut self, _: &PluginData) {
         self.activity = Some(Mutex::new(ActivityData {
-            large_image: "northstar".to_string(),
+            large_image: Some("northstar".to_string()),
             state: "Loading...".to_string(),
             ..Default::default()
         }));
     }
 
     fn main(&self) {
-        let mut drpc: Discord<'_, DiscordEvent> = match Discord::new(APP_ID) {
-            Ok(drpc) => drpc,
+        let runtime = match Runtime::new() {
+            Ok(rt) => rt,
             Err(err) => {
-                log::error!("failed to load discord rpc; Is your discord running?");
-                log::error!("{err}");
+                log::error!("failed to create a runtime; {:?}", err);
                 return;
             }
         };
-
-        drpc.clear_activity(|discord, _| {
-            discord.update_activity(
-                Activity::empty()
-                    .with_state("Loading...")
-                    .with_small_image_key("northstar"),
-                |_, result| match result {
-                    Ok(_) => log::info!("cleared activity"),
-                    Err(err) => log::error!("coudln't clear activity because of {:?}", err),
-                },
-            )
-        });
-
-        if let Err(err) = drpc.run_callbacks() {
-            #[cfg(debug_assertions)]
-            log::error!("failed to run callbacks {err}");
-            #[cfg(not(debug_assertions))]
-            drop(err)
-        }
-
-        loop {
-            let data = self.activity.as_ref().unwrap().lock().unwrap().clone();
-
-            drpc.update_activity(
-                Activity::empty()
-                    .with_details(&data.details)
-                    .with_state(&data.state)
-                    .with_large_image_key(&data.large_image)
-                    .with_small_image_key(&data.small_image)
-                    .with_large_image_tooltip(&data.large_text)
-                    .with_small_image_tooltip(&data.small_text)
-                    .with_end_time(data.end)
-                    .with_start_time(data.start)
-                    .with_party_amount(data.party.0)
-                    .with_party_capacity(data.party.1),
-                |_, result| {
-                    if let Err(err) = result {
-                        #[cfg(debug_assertions)]
-                        log::error!("coudln't update activity because of {err:?}");
-                        #[cfg(not(debug_assertions))]
-                        drop(err)
-                    }
-                },
-            );
-            
-            #[cfg(debug_assertions)] // if the user turns off discord the console would be spammed 
-            if let Err(err) = drpc.run_callbacks() {
-                log::error!("failed to run callbacks {err}");
-            }
-            #[cfg(not(debug_assertions))]
-            drpc.run_callbacks().expect("wow just crash, no discord"); // this will only stop the thread
-            wait(1000)
-        }
+        runtime.block_on(async_main());
     }
 
     fn on_presence_updated(&self, presence: &GamePresence) {
@@ -125,31 +84,22 @@ impl Plugin for DiscordRpc {
                 activity.party = (0, 0);
                 activity.details = "".to_string();
                 activity.state = "Loading...".to_string();
-                activity.large_image = "northstar".to_string();
-                activity.large_text = "Titanfall 2 + Northstar".to_string();
-                activity.small_image = EMPTY;
-                activity.small_text = EMPTY;
-                activity.end = 0;
+                activity.large_image = Some("northstar".to_string());
+                activity.large_text = Some("Titanfall 2 + Northstar".to_string());
             }
             GameStateEnum::MainMenu => {
                 activity.party = (0, 0);
                 activity.details = "Main Menu".to_string();
                 activity.state = "On Main Menu".to_string();
-                activity.large_image = "northstar".to_string();
-                activity.large_text = "Titanfall 2 + Northstar".to_string();
-                activity.small_image = EMPTY;
-                activity.small_text = EMPTY;
-                activity.end = 0;
+                activity.large_image = Some("northstar".to_string());
+                activity.large_text = Some("Titanfall 2 + Northstar".to_string());
             }
             GameStateEnum::Lobby => {
                 activity.party = (0, 0);
                 activity.details = "Lobby".to_string();
                 activity.state = "In the Lobby".to_string();
-                activity.large_image = "northstar".to_string();
-                activity.large_text = "Titanfall 2 + Northstar".to_string();
-                activity.small_image = EMPTY;
-                activity.small_text = EMPTY;
-                activity.end = 0;
+                activity.large_image = Some("northstar".to_string());
+                activity.large_text = Some("Titanfall 2 + Northstar".to_string());
             }
             GameStateEnum::InGame => {
                 let map_displayname = presence.get_map_displayname();
@@ -163,15 +113,15 @@ impl Plugin for DiscordRpc {
                 );
                 activity.details = map_displayname.clone();
                 activity.state = map_displayname.clone();
-                activity.large_image = presence.get_map();
-                activity.large_text = map_displayname;
-                activity.small_image = "northstar".to_string();
-                activity.small_text = "Titanfall 2 + Northstar".to_string();
+                activity.large_image = Some(presence.get_map());
+                activity.large_text = Some(map_displayname);
+                activity.small_image = Some("northstar".to_string());
+                activity.small_text = Some("Titanfall 2 + Northstar".to_string());
                 if presence.get_playlist() == "campaign" {
                     activity.party = (0, 0);
                     activity.end = 0;
                 } else {
-                    activity.state = presence.get_playlist_displayname().replace("#PL_", "");
+                    activity.state = presence.get_playlist_displayname();
                     activity.details = format!(
                         "Score: {} - {} (First to {})",
                         presence.get_own_score(),
@@ -181,7 +131,7 @@ impl Plugin for DiscordRpc {
 
                     let current_time = SystemTime::now()
                         .duration_since(UNIX_EPOCH)
-                        .unwrap()
+                        .unwrap_or_default()
                         .as_secs() as i64;
                     let ig_end = presence.get_timestamp_end() as i64;
                     activity.end = current_time + ig_end;
@@ -193,7 +143,82 @@ impl Plugin for DiscordRpc {
 
 entry!(DiscordRpc);
 
-#[derive(Default)]
-pub struct DiscordEvent;
+async fn async_main() {
+    let activity = PLUGIN.wait().activity.as_ref().unwrap();
 
-impl EventHandler for DiscordEvent {}
+    let client = match make_client(Subscriptions::ACTIVITY).await {
+        Ok(c) => c,
+        Err(_) => {
+            log::error!("Is your discord running?");
+            return;
+        }
+    };
+
+    match client.discord.clear_activity().await {
+        Ok(_) => log::info!("cleared activity"),
+        Err(err) => log::error!("coudln't clear activity because of {:?}", err),
+    }
+
+    loop {
+        let data = activity.lock().unwrap().clone();
+
+        if let Err(err) = client
+            .discord
+            .update_activity(
+                ActivityBuilder::default()
+                    .details(data.details)
+                    .state(data.state)
+                    .assets(Assets {
+                        large_image: data.large_image,
+                        large_text: data.large_text,
+                        small_image: data.small_image,
+                        small_text: data.small_text,
+                    })
+                    .start_timestamp(if data.start == 0 { 1 } else { data.start })
+                    .end_timestamp(data.end),
+            )
+            .await
+        {
+            log::info!("failed to updated discord activity; {err}");
+            #[cfg(not(debug_assertions))]
+            return;
+        }
+
+        wait(1000);
+    }
+}
+
+pub async fn make_client(subs: Subscriptions) -> Result<Client, ()> {
+    let (wheel, handler) = Wheel::new(Box::new(|err| {
+        log::warn!("encountered an error {err:?}; shouldn't be fatal");
+    }));
+
+    let mut user = wheel.user();
+
+    let discord = match Discord::new(DiscordApp::PlainId(APP_ID), subs, Box::new(handler)) {
+        Ok(d) => d,
+        Err(_) => {
+            log::error!("unable to create discord client");
+            Err(())?
+        }
+    };
+
+    log::info!("waiting for handshake...");
+    user.0.changed().await.unwrap();
+
+    let user = match &*user.0.borrow() {
+        UserState::Connected(user) => user.clone(),
+        UserState::Disconnected(err) => {
+            log::error!("failed to connect to Discord: {}", err);
+            Err(())?
+        }
+    };
+
+    log::info!("connected to Discord, local user is {:#?}", user);
+
+    Ok(Client {
+        discord,
+        user,
+        wheel,
+    })
+}
