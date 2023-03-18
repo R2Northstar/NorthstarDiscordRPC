@@ -100,8 +100,7 @@ impl Plugin for DiscordRpc {
                 log::error!("failed to run callbacks {err}");
             }
             #[cfg(not(debug_assertions))]
-            log::error!("failed to run callbacks");
-
+            drpc.run_callbacks().expect("wow just crash, no discord"); // this will only stop the thread
             wait(1000)
         }
     }
