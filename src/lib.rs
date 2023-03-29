@@ -14,6 +14,7 @@ use rrplug::prelude::*;
 use rrplug::wrappers::presence::{GamePresence, GameStateEnum};
 use tokio::runtime::Runtime;
 
+/// the discord app's id, taken from older v1 discord rpc
 const APP_ID: i64 = 941428101429231617;
 
 #[derive(Debug, Default, Clone)]
@@ -63,7 +64,8 @@ impl Plugin for DiscordRpc {
         };
         runtime.block_on(async_main());
     }
-
+    
+    /// receives presence updates here
     fn on_presence_updated(&self, presence: &GamePresence) {
         let mut activity = match self.activity.as_ref().unwrap().try_lock() {
             Ok(a) => a,
@@ -161,7 +163,8 @@ async fn async_main() {
 
     loop {
         let data = activity.lock().unwrap().clone();
-
+        
+        // updates presence here
         if let Err(err) = client
             .discord
             .update_activity(
@@ -188,6 +191,7 @@ async fn async_main() {
     }
 }
 
+/// discord connection init sourced from https://github.com/EmbarkStudios/discord-sdk/blob/d311db749b7e11cc55cb1a9d7bfd9a95cfe61fd1/examples-shared/src/lib.rs#L16
 pub async fn make_client(subs: Subscriptions) -> Result<Client, ()> {
     let (wheel, handler) = Wheel::new(Box::new(|err| {
         log::warn!("encountered an error {err:?}; shouldn't be fatal");
