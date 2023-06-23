@@ -1,0 +1,170 @@
+#![deny(non_snake_case)]
+
+use rrplug::prelude::*;
+use rrplug::{
+    bindings::squirrelclasstypes::ScriptContext,
+    call_sq_function,
+    high::{squirrel::compile_string, Handle},
+};
+use std::{
+    ops::DerefMut,
+    time::{SystemTime, UNIX_EPOCH},
+};
+
+use crate::presense_bindings::{GameState, GameStateStruct, UIPresenceStruct};
+
+pub fn run_presence_updates(sqvm: Handle<*mut HSquirrelVM>) {
+    let sqvm = *sqvm.get();
+    let sq_functions = SQFUNCTIONS.client.wait();
+
+    if let Err(err) = compile_string(
+        sqvm,
+        sq_functions,
+        true,
+        r#"
+    thread void function() {
+        wait 0
+        for(;;) {
+            FetchPresence()
+            wait 0
+        }
+    }()
+    "#,
+    ) {
+        err.log()
+    }
+}
+
+#[rrplug::sqfunction(VM = "UiClient", ExportName = "FetchPresence")]
+pub fn fetch_presence() {
+    let plugin = crate::PLUGIN.wait();
+    let mut presence_lock = plugin.presence_data.lock();
+    let (cl_presence, ui_presence) = presence_lock.deref_mut();
+    let sqvm = unsafe { sqvm.as_mut().ok_or_else(|| "None sqvm".to_string())? };
+    let context = unsafe {
+        std::mem::transmute::<_, ScriptContext>(
+            sqvm.sharedState
+                .as_ref()
+                .ok_or_else(|| "None shared state".to_string())?
+                .cSquirrelVM
+                .as_ref()
+                .ok_or_else(|| "None csqvm".to_string())?
+                .vmContext,
+        )
+    };
+
+    match context {
+        ScriptContext::CLIENT => {
+            if let Err(err) = call_sq_function!(
+                sqvm,
+                sq_functions,
+                "NorthstarCodeCallback_GenerateGameState",
+                cl_presence.clone()
+            ) {
+                #[cfg(debug_assertions)]
+                log::warn!("NorthstarCodeCallback_GenerateGameState call failed : {err}");
+                #[cfg(not(debug_assertions))]
+                drop(err);
+            } else {
+                *cl_presence = GameStateStruct::get_from_sqvm(sqvm, sq_functions, sqvm._stackbase);
+            }
+        }
+        ScriptContext::UI => {
+            match call_sq_function!(
+                sqvm,
+                sq_functions,
+                "NorthstarCodeCallback_GenerateUIPresence",
+                ui_presence.clone()
+            ) {
+                Err(err) => {
+                    #[cfg(debug_assertions)]
+                    log::warn!("NorthstarCodeCallback_GenerateUIPresence call failed : {err}");
+                    #[cfg(not(debug_assertions))]
+                    drop(err);
+                }
+                Ok(_) => {
+                    *ui_presence =
+                        UIPresenceStruct::get_from_sqvm(sqvm, sq_functions, sqvm._stackbase);
+                }
+            }
+        }
+        _ => {}
+    }
+
+    on_presence_updated(plugin, cl_presence, ui_presence);
+
+    Ok(())
+}
+
+/// receives presence updates here
+fn on_presence_updated(
+    plugin: &crate::DiscordRpcPlugin,
+    cl_presence: &GameStateStruct,
+    ui_presence: &UIPresenceStruct,
+) {
+    let mut activity = plugin.activity.lock();
+
+    match ui_presence.game_state {
+        GameState::InGame => {}
+        _ => {
+            let start = SystemTime::now();
+            let since_the_epoch = start.duration_since(UNIX_EPOCH).unwrap(); // there is no way this fails
+            activity.start = since_the_epoch.as_secs() as i64;
+        }
+    };
+
+    match ui_presence.game_state {
+        GameState::Loading => {
+            activity.party = (0, 0);
+            activity.details = "".to_string();
+            activity.state = "Loading...".to_string();
+            activity.large_image = Some("northstar".to_string());
+            activity.large_text = Some("Titanfall 2 + Northstar".to_string());
+        }
+        GameState::MainMenu => {
+            activity.party = (0, 0);
+            activity.details = "Main Menu".to_string();
+            activity.state = "On Main Menu".to_string();
+            activity.large_image = Some("northstar".to_string());
+            activity.large_text = Some("Titanfall 2 + Northstar".to_string());
+        }
+        GameState::Lobby => {
+            activity.party = (0, 0);
+            activity.details = "Lobby".to_string();
+            activity.state = "In the Lobby".to_string();
+            activity.large_image = Some("northstar".to_string());
+            activity.large_text = Some("Titanfall 2 + Northstar".to_string());
+        }
+        GameState::InGame => {
+            let map_displayname = cl_presence.map_displayname.clone();
+
+            activity.party = (
+                cl_presence.current_players.try_into().unwrap_or_default(),
+                cl_presence.max_players.try_into().unwrap_or_default(),
+            );
+            activity.details = map_displayname.clone();
+            activity.state = map_displayname.clone();
+            activity.large_image = Some(cl_presence.map.clone());
+            activity.large_text = Some(map_displayname);
+            activity.small_image = Some("northstar".to_string());
+            activity.small_text = Some("Titanfall 2 + Northstar".to_string());
+            if cl_presence.playlist == "campaign" {
+                activity.party = (0, 0);
+                activity.end = 0;
+            } else {
+                activity.state = cl_presence.playlist_displayname.clone();
+                activity.details = format!(
+                    "Score: {} - {} (First to {})",
+                    cl_presence.own_score, cl_presence.other_highest_score, cl_presence.max_score,
+                );
+
+                let current_time = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .unwrap_or_default()
+                    .as_secs() as i64;
+                let ig_end = cl_presence.time_end.ceil() as i64;
+                activity.end = current_time + ig_end;
+            }
+        }
+    };
+}
