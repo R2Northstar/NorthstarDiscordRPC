@@ -23,10 +23,10 @@ pub fn run_presence_updates(sqvm: Handle<*mut HSquirrelVM>) {
         true,
         r#"
     thread void function() {
-        wait 0
+        wait 1
         for(;;) {
             FetchPresence()
-            wait 0
+            wait 1
         }
     }()
     "#,
@@ -104,44 +104,48 @@ fn on_presence_updated(
 ) {
     let mut activity = plugin.activity.lock();
 
-    match ui_presence.game_state {
-        GameState::InGame => {}
-        _ => {
-            let start = SystemTime::now();
-            let since_the_epoch = start.duration_since(UNIX_EPOCH).unwrap(); // there is no way this fails
-            activity.start = since_the_epoch.as_secs() as i64;
-        }
-    };
+    if activity.last_state != ui_presence.game_state {
+        activity.start = Some(
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs() as i64,
+        );
+        activity.last_state = ui_presence.game_state;
+    }
 
     match ui_presence.game_state {
         GameState::Loading => {
-            activity.party = (0, 0);
+            activity.party = None;
             activity.details = "".to_string();
             activity.state = "Loading...".to_string();
             activity.large_image = Some("northstar".to_string());
             activity.large_text = Some("Titanfall 2 + Northstar".to_string());
+            activity.end = None;
         }
         GameState::MainMenu => {
-            activity.party = (0, 0);
+            activity.party = None;
             activity.details = "Main Menu".to_string();
             activity.state = "On Main Menu".to_string();
             activity.large_image = Some("northstar".to_string());
             activity.large_text = Some("Titanfall 2 + Northstar".to_string());
+            activity.end = None;
         }
         GameState::Lobby => {
-            activity.party = (0, 0);
+            activity.party = None;
             activity.details = "Lobby".to_string();
             activity.state = "In the Lobby".to_string();
             activity.large_image = Some("northstar".to_string());
             activity.large_text = Some("Titanfall 2 + Northstar".to_string());
+            activity.end = None;
         }
         GameState::InGame => {
             let map_displayname = cl_presence.map_displayname.clone();
 
-            activity.party = (
+            activity.party = Some((
                 cl_presence.current_players.try_into().unwrap_or_default(),
                 cl_presence.max_players.try_into().unwrap_or_default(),
-            );
+            ));
             activity.details = map_displayname.clone();
             activity.state = map_displayname.clone();
             activity.large_image = Some(cl_presence.map.clone());
@@ -149,8 +153,8 @@ fn on_presence_updated(
             activity.small_image = Some("northstar".to_string());
             activity.small_text = Some("Titanfall 2 + Northstar".to_string());
             if cl_presence.playlist == "campaign" {
-                activity.party = (0, 0);
-                activity.end = 0;
+                activity.party = None;
+                activity.end = None;
             } else {
                 activity.state = cl_presence.playlist_displayname.clone();
                 activity.details = format!(
@@ -158,12 +162,14 @@ fn on_presence_updated(
                     cl_presence.own_score, cl_presence.other_highest_score, cl_presence.max_score,
                 );
 
-                let current_time = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .unwrap_or_default()
-                    .as_secs() as i64;
-                let ig_end = cl_presence.time_end.ceil() as i64;
-                activity.end = current_time + ig_end;
+                if activity.end.is_none() {
+                    let current_time = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .unwrap_or_default()
+                        .as_secs() as i64;
+                    let ig_end = cl_presence.time_end.ceil() as i64;
+                    activity.end = Some(current_time + ig_end);
+                }
             }
         }
     };

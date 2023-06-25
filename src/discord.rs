@@ -41,40 +41,49 @@ pub async fn async_main() {
     loop {
         let data = activity.lock().clone();
 
+        if let Some(img) = &data.large_image {
+            if img.is_empty() {
+                log::warn!("img is empty at {:?}", data.last_state);
+            }
+        }
+
+        let mut activity_builder = ActivityBuilder::default()
+            .details(data.details)
+            .state(data.state)
+            .assets(Assets {
+                large_image: data.large_image,
+                large_text: data.large_text,
+                small_image: data.small_image,
+                small_text: data.small_text,
+            });
+
+        if let Some(start) = data.start {
+            activity_builder = activity_builder.start_timestamp(if start == 0 { 1 } else { start });
+        }
+        if let Some(end) = data.end {
+            activity_builder = activity_builder.end_timestamp(end);
+        }
+        if let Some(party) = data.party {
+            activity_builder = activity_builder.party(
+                "whar",
+                Some(
+                    party
+                        .0
+                        .try_into()
+                        .unwrap_or(NonZeroU32::new(1).unwrap()),
+                ),
+                Some(
+                    party
+                        .1
+                        .try_into()
+                        .unwrap_or(NonZeroU32::new(1).unwrap()),
+                ),
+                PartyPrivacy::Private,
+            );
+        }
+
         // updates presence here
-        if let Err(err) = client
-            .discord
-            .update_activity(
-                ActivityBuilder::default()
-                    .details(data.details)
-                    .state(data.state)
-                    .assets(Assets {
-                        large_image: data.large_image,
-                        large_text: data.large_text,
-                        small_image: data.small_image,
-                        small_text: data.small_text,
-                    })
-                    .start_timestamp(if data.start == 0 { 1 } else { data.start })
-                    .end_timestamp(data.end)
-                    .party(
-                        "whar",
-                        Some(
-                            data.party
-                                .0
-                                .try_into()
-                                .unwrap_or(NonZeroU32::new(1).unwrap()),
-                        ),
-                        Some(
-                            data.party
-                                .1
-                                .try_into()
-                                .unwrap_or(NonZeroU32::new(1).unwrap()),
-                        ),
-                        PartyPrivacy::Private,
-                    ),
-            )
-            .await
-        {
+        if let Err(err) = client.discord.update_activity(activity_builder).await {
             log::info!("failed to updated discord activity; {err}");
             #[cfg(not(debug_assertions))]
             return;
@@ -110,7 +119,7 @@ pub async fn make_client(subs: Subscriptions) -> Result<Client, ()> {
             Err(())?
         }
     };
-    
+
     #[cfg(debug_assertions)]
     log::info!("connected to Discord, local user is {:#?}", user);
 

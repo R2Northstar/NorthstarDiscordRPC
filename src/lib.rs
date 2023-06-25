@@ -2,6 +2,7 @@
 
 use parking_lot::Mutex;
 use presense::run_presence_updates;
+use presense_bindings::GameState;
 use rrplug::prelude::*;
 use tokio::runtime::Runtime;
 
@@ -17,15 +18,16 @@ pub(crate) mod utils;
 
 #[derive(Debug, Default, Clone)]
 pub struct ActivityData {
-    party: (u32, u32),
+    party: Option<(u32, u32)>,
     details: String,
     state: String,
     large_image: Option<String>,
     large_text: Option<String>,
     small_image: Option<String>,
     small_text: Option<String>,
-    end: i64,
-    start: i64,
+    end: Option<i64>,
+    start: Option<i64>,
+    last_state: GameState,
 }
 
 pub struct DiscordRpcPlugin {

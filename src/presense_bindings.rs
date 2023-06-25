@@ -3,7 +3,9 @@
 use rrplug::high::squirrel_traits::{GetFromSQObject, GetFromSquirrelVm, PushToSquirrelVm};
 use rrplug::prelude::*;
 
-#[derive(PushToSquirrelVm, GetFromSquirrelVm, GetFromSQObject, Clone, Copy)]
+#[derive(
+    PushToSquirrelVm, GetFromSquirrelVm, GetFromSQObject, Clone, Copy, Debug, PartialEq, Eq,
+)]
 #[repr(i32)]
 pub enum GameState {
     Loading,
