@@ -66,18 +66,8 @@ pub async fn async_main() {
         if let Some(party) = data.party {
             activity_builder = activity_builder.party(
                 "whar",
-                Some(
-                    party
-                        .0
-                        .try_into()
-                        .unwrap_or(NonZeroU32::new(1).unwrap()),
-                ),
-                Some(
-                    party
-                        .1
-                        .try_into()
-                        .unwrap_or(NonZeroU32::new(1).unwrap()),
-                ),
+                Some(party.0.try_into().unwrap_or(NonZeroU32::new(1).unwrap())),
+                Some(party.1.try_into().unwrap_or(NonZeroU32::new(1).unwrap())),
                 PartyPrivacy::Private,
             );
         }

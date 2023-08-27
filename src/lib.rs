@@ -1,14 +1,13 @@
 #![allow(non_snake_case)]
 
 use parking_lot::Mutex;
-use presense::run_presence_updates;
-use presense_bindings::GameState;
 use rrplug::prelude::*;
 use tokio::runtime::Runtime;
 
 use crate::{
     discord::async_main,
-    presense_bindings::{GameStateStruct, UIPresenceStruct},
+    presense_bindings::{GameStateStruct, UIPresenceStruct,GameState},
+    presense::run_presence_updates,
 };
 
 pub(crate) mod discord;
@@ -16,6 +15,7 @@ pub(crate) mod presense;
 pub(crate) mod presense_bindings;
 pub(crate) mod utils;
 
+#[deny(non_snake_case)]
 #[derive(Debug, Default, Clone)]
 pub struct ActivityData {
     party: Option<(u32, u32)>,
@@ -30,11 +30,13 @@ pub struct ActivityData {
     last_state: GameState,
 }
 
+#[deny(non_snake_case)]
 pub struct DiscordRpcPlugin {
     pub activity: Mutex<ActivityData>,
     pub presence_data: Mutex<(GameStateStruct, UIPresenceStruct)>,
 }
 
+#[deny(non_snake_case)]
 impl Plugin for DiscordRpcPlugin {
     fn new(plugin_data: &PluginData) -> Self {
         plugin_data.register_sq_functions(presense::fetch_presence);
