@@ -58,11 +58,11 @@ pub fn fetch_presence() {
             if let Err(err) = call_sq_function!(
                 sqvm,
                 sq_functions,
-                "NorthstarCodeCallback_GenerateGameState",
+                "DiscordRPC_GenerateGameState",
                 cl_presence.clone()
             ) {
                 #[cfg(debug_assertions)]
-                log::warn!("NorthstarCodeCallback_GenerateGameState call failed : {err}");
+                log::warn!("DiscordRPC_GenerateGameState call failed : {err}");
                 #[cfg(not(debug_assertions))]
                 drop(err);
             } else {
@@ -73,12 +73,12 @@ pub fn fetch_presence() {
             match call_sq_function!(
                 sqvm,
                 sq_functions,
-                "NorthstarCodeCallback_GenerateUIPresence",
+                "DiscordRPC_GenerateUIPresence",
                 ui_presence.clone()
             ) {
                 Err(err) => {
                     #[cfg(debug_assertions)]
-                    log::warn!("NorthstarCodeCallback_GenerateUIPresence call failed : {err}");
+                    log::warn!("DiscordRPC_GenerateUIPresence call failed : {err}");
                     #[cfg(not(debug_assertions))]
                     drop(err);
                 }
