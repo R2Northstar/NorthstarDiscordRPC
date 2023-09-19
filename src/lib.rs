@@ -7,13 +7,12 @@ use tokio::runtime::Runtime;
 use crate::{
     discord::async_main,
     presense_bindings::{GameStateStruct, UIPresenceStruct,GameState},
-    presense::run_presence_updates,
+    presence::run_presence_updates,
 };
 
 pub(crate) mod discord;
-pub(crate) mod presense;
+pub(crate) mod presence;
 pub(crate) mod presense_bindings;
-pub(crate) mod utils;
 
 #[deny(non_snake_case)]
 #[derive(Debug, Default, Clone)]
@@ -39,7 +38,7 @@ pub struct DiscordRpcPlugin {
 #[deny(non_snake_case)]
 impl Plugin for DiscordRpcPlugin {
     fn new(plugin_data: &PluginData) -> Self {
-        plugin_data.register_sq_functions(presense::fetch_presence);
+        plugin_data.register_sq_functions(presence::fetch_presence);
 
         let activity = Mutex::new(ActivityData {
             large_image: Some("northstar".to_string()),
