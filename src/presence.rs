@@ -13,6 +13,7 @@ use std::{
 
 use crate::presense_bindings::{GameState, GameStateStruct, UIPresenceStruct};
 
+// heartbeat for pulling presence
 pub fn run_presence_updates(sqvm: Handle<*mut HSquirrelVM>) {
     let sqvm = *sqvm.get();
     let sq_functions = SQFUNCTIONS.client.wait();
@@ -35,6 +36,7 @@ pub fn run_presence_updates(sqvm: Handle<*mut HSquirrelVM>) {
     }
 }
 
+/// function to pull presence from the sqvm since in runframe it's impossibke to get the output of a function back
 #[rrplug::sqfunction(VM = "UiClient", ExportName = "FetchPresence")]
 pub fn fetch_presence() {
     let plugin = crate::PLUGIN.wait();

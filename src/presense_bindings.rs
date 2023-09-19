@@ -1,4 +1,5 @@
 #![deny(non_snake_case)]
+//! bindings to squirrel structs
 
 use rrplug::high::squirrel_traits::{GetFromSQObject, GetFromSquirrelVm, PushToSquirrelVm};
 use rrplug::prelude::*;
@@ -7,6 +8,7 @@ use rrplug::prelude::*;
     PushToSquirrelVm, GetFromSquirrelVm, GetFromSQObject, Clone, Copy, Debug, PartialEq, Eq,
 )]
 #[repr(i32)]
+/// binding to GameState
 pub enum GameState {
     Loading,
     MainMenu,
@@ -15,6 +17,7 @@ pub enum GameState {
 }
 
 #[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
+/// binding to GameStateStruct
 pub struct GameStateStruct {
     pub map: String,
     pub map_displayname: String,
@@ -29,6 +32,7 @@ pub struct GameStateStruct {
 }
 
 #[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
+/// binding to UIPresenceStruct
 pub struct UIPresenceStruct {
     pub game_state: GameState,
 }

@@ -16,6 +16,7 @@ pub(crate) mod presense_bindings;
 
 #[deny(non_snake_case)]
 #[derive(Debug, Default, Clone)]
+#[doc = "struct for all the possible information on the rpc"]
 pub struct ActivityData {
     party: Option<(u32, u32)>,
     details: String,

@@ -16,12 +16,16 @@ use crate::exports::PLUGIN;
 /// the discord app's id, taken from older v1 discord rpc
 const APP_ID: i64 = 941428101429231617;
 
+/// struct to hold everything required to run discord rpc
 pub struct Client {
     pub discord: Discord,
     pub user: User,
     pub wheel: Wheel,
 }
 
+/// discord rpc update function
+/// 
+///  doesn't run on the titanfall 2 thread since it needs async
 pub async fn async_main() {
     let activity = &PLUGIN.wait().activity;
 
