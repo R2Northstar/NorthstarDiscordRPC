@@ -2,7 +2,7 @@
 
 use discord_sdk::activity::Secrets;
 use parking_lot::Mutex;
-use rrplug::{bindings::cvar::convar::FCVAR_CLIENTDLL, prelude::*};
+use rrplug::prelude::*;
 use tokio::runtime::Runtime;
 use uuid::Uuid;
 
@@ -61,7 +61,6 @@ impl Plugin for DiscordRpcPlugin {
             Ok(rt) => rt.block_on(async_main()),
             Err(err) => {
                 log::error!("failed to create a runtime; {:?}", err);
-                return;
             }
         });
 
@@ -92,10 +91,10 @@ impl Plugin for DiscordRpcPlugin {
 
         engine_data
             .register_concommand(
-                "discord_rpc_reload_secrets",
+                "discord_reload_secrets",
                 reload_secrets,
                 "reloads the secrets for joining games",
-                FCVAR_CLIENTDLL as i32,
+                0,
             )
             .expect("couldn't register reload secrets");
     }
@@ -103,6 +102,8 @@ impl Plugin for DiscordRpcPlugin {
 
 #[rrplug::concommand]
 fn reload_secrets() {
+    log::info!("secrets reloaded");
+
     PLUGIN.wait().activity.lock().secrets = Secrets {
         r#match: Uuid::new_v4().to_string().into(),
         join: Uuid::new_v4().to_string().into(),

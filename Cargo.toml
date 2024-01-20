@@ -6,7 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rrplug = { git = "https://github.com/R2NorthstarTools/rrplug.git", rev = "3a31f4a9173d2e82f8d4b2a30bafa3faf57a5158" }
+rrplug = { git = "https://github.com/R2NorthstarTools/rrplug.git", rev = "209a8b4b478ab095e3186dd32a3ed29dc9dbffee" }
 discord-sdk = "0.3.2"
 tokio = "1.26.0"
 parking_lot = "0.12.1"
