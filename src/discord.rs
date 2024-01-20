@@ -14,7 +14,8 @@ use rrplug::prelude::*;
 use crate::exports::PLUGIN;
 
 /// the discord app's id, taken from older v1 discord rpc
-const APP_ID: i64 = 941428101429231617;
+// const APP_ID: i64 = 941428101429231617;
+const APP_ID: i64 = 1198009103516180500;
 
 /// struct to hold everything required to run discord rpc
 pub struct Client {
@@ -59,7 +60,8 @@ pub async fn async_main() {
                 large_text: data.large_text,
                 small_image: data.small_image,
                 small_text: data.small_text,
-            });
+            })
+            .secrets(data.secrets);
 
         if let Some(start) = data.start {
             activity_builder = activity_builder.start_timestamp(if start == 0 { 1 } else { start });

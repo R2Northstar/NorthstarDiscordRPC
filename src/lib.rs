@@ -1,8 +1,10 @@
 #![allow(non_snake_case)]
 
+use discord_sdk::activity::Secrets;
 use parking_lot::Mutex;
-use rrplug::prelude::*;
+use rrplug::{bindings::cvar::convar::FCVAR_CLIENTDLL, prelude::*};
 use tokio::runtime::Runtime;
+use uuid::Uuid;
 
 use crate::{
     discord::async_main,
@@ -28,6 +30,7 @@ pub struct ActivityData {
     end: Option<i64>,
     start: Option<i64>,
     last_state: GameState,
+    secrets: Secrets,
 }
 
 #[deny(non_snake_case)]
@@ -38,8 +41,15 @@ pub struct DiscordRpcPlugin {
 
 #[deny(non_snake_case)]
 impl Plugin for DiscordRpcPlugin {
-    fn new(plugin_data: &PluginData) -> Self {
-        plugin_data.register_sq_functions(presence::fetch_presence);
+    const PLUGIN_INFO: PluginInfo = PluginInfo::new(
+        "DISCORDRPC\0",
+        "DISCORDXD\0",
+        "DISCORDRPC\0",
+        PluginContext::CLIENT,
+    );
+
+    fn new(_: bool) -> Self {
+        register_sq_functions(presence::fetch_presence);
 
         let activity = Mutex::new(ActivityData {
             large_image: Some("northstar".to_string()),
@@ -61,14 +71,43 @@ impl Plugin for DiscordRpcPlugin {
         }
     }
 
-    fn on_sqvm_created(&self, sqvm_handle: &CSquirrelVMHandle) {
+    fn on_sqvm_created(&self, sqvm_handle: &CSquirrelVMHandle, _: EngineToken) {
         match sqvm_handle.get_context() {
-            ScriptVmType::Client | ScriptVmType::Ui => {
+            ScriptContext::CLIENT | ScriptContext::UI => {
                 run_presence_updates(unsafe { sqvm_handle.get_sqvm() })
             }
             _ => {}
         }
     }
+
+    fn on_dll_load(
+        &self,
+        engine_data: Option<&EngineData>,
+        _dll_ptr: &DLLPointer,
+        _engine_token: EngineToken,
+    ) {
+        let Some(engine_data) = engine_data else {
+            return;
+        };
+
+        engine_data
+            .register_concommand(
+                "discord_rpc_reload_secrets",
+                reload_secrets,
+                "reloads the secrets for joining games",
+                FCVAR_CLIENTDLL as i32,
+            )
+            .expect("couldn't register reload secrets");
+    }
+}
+
+#[rrplug::concommand]
+fn reload_secrets() {
+    PLUGIN.wait().activity.lock().secrets = Secrets {
+        r#match: Uuid::new_v4().to_string().into(),
+        join: Uuid::new_v4().to_string().into(),
+        spectate: None,
+    };
 }
 
 entry!(DiscordRpcPlugin);
