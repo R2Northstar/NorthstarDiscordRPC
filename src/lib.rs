@@ -42,7 +42,7 @@ pub struct DiscordRpcPlugin {
 impl Plugin for DiscordRpcPlugin {
     const PLUGIN_INFO: PluginInfo = PluginInfo::new(
         "DISCORDRPC\0",
-        "DISCORDXD\0",
+        "DSCRD-RPC\0",
         "DISCORDRPC\0",
         PluginContext::CLIENT,
     );
