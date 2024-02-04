@@ -9,7 +9,7 @@ use discord_sdk::{
     wheel::Wheel,
     Discord, DiscordApp, Subscriptions,
 };
-use rrplug::prelude::*;
+use rrplug::{mid::utils::try_cstring, prelude::*};
 use tokio::sync::broadcast::Receiver;
 
 use crate::{exports::PLUGIN, invite_handler::JOIN_HANDLER_FUNCTION};
@@ -99,7 +99,10 @@ async fn handle_activity_events(
     discord: &Discord,
 ) -> Option<()> {
     match events.try_recv().ok()? {
-        ActivityEvent::Join(join) => JOIN_HANDLER_FUNCTION.lock()(join.secret),
+        ActivityEvent::Join(join) => {
+            let secret = try_cstring(&join.secret).expect("I like null bytes in my strings cool");
+            JOIN_HANDLER_FUNCTION.lock()(secret.as_ptr())
+        }
         ActivityEvent::Spectate(_) => log::warn!("spectating cannot be supported!"),
         ActivityEvent::JoinRequest(request) => {
             log::info!("{} joined the party", request.user.username);
