@@ -5,7 +5,6 @@ use parking_lot::Mutex;
 use rrplug::interfaces::manager::register_interface;
 use rrplug::prelude::*;
 use tokio::runtime::Runtime;
-use uuid::Uuid;
 
 use crate::{
     discord::async_main,
@@ -46,7 +45,7 @@ pub struct DiscordRpcPlugin {
 impl Plugin for DiscordRpcPlugin {
     const PLUGIN_INFO: PluginInfo = PluginInfo::new(
         "DISCORDRPC\0",
-        "DISCORDXD\0",
+        "DSCRD-RPC\0",
         "DISCORDRPC\0",
         PluginContext::CLIENT,
     );
@@ -83,37 +82,6 @@ impl Plugin for DiscordRpcPlugin {
             _ => {}
         }
     }
-
-    fn on_dll_load(
-        &self,
-        engine_data: Option<&EngineData>,
-        _dll_ptr: &DLLPointer,
-        _engine_token: EngineToken,
-    ) {
-        let Some(engine_data) = engine_data else {
-            return;
-        };
-
-        engine_data
-            .register_concommand(
-                "discord_reload_secrets",
-                reload_secrets,
-                "reloads the secrets for joining games",
-                0,
-            )
-            .expect("couldn't register reload secrets");
-    }
-}
-
-#[rrplug::concommand]
-fn reload_secrets() {
-    log::info!("secrets reloaded");
-
-    PLUGIN.wait().activity.lock().secrets = Secrets {
-        r#match: Uuid::new_v4().to_string().into(),
-        join: Uuid::new_v4().to_string().into(),
-        spectate: None,
-    };
 }
 
 entry!(DiscordRpcPlugin);
