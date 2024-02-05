@@ -15,20 +15,20 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+        uses: microsoft/setup-msbuild@v2
       - name: Build
         run: |
           cargo build --release --verbose
       - name: Upload RPC build as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: northstar-discord-rpc
           path: |
             target/release/*.dll
       - name: Upload debug build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: discord-rpc-debug-files
           path: |
@@ -40,12 +40,12 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Download compiled RPC
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: northstar-discord-rpc
           path: northstar-discord-rpc
       - name: Download debug files
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: discord-rpc-debug-files
           path: discord-rpc-debug-files
