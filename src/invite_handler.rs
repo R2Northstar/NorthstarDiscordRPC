@@ -7,6 +7,9 @@ pub static JOIN_HANDLER_FUNCTION: Mutex<JoinHandler> = Mutex::new(default_join_h
 
 type JoinHandler = extern "C" fn(*const c_char);
 
+/// Success/Failure
+///
+/// fails if the string is non utf-8 or the pointer is null
 #[repr(C)]
 #[must_use]
 pub enum IniviteHandlerResult {
@@ -14,6 +17,7 @@ pub enum IniviteHandlerResult {
     Failure,
 }
 
+/// registered as "InviteHandler001"
 #[repr(C)]
 pub(crate) struct InviteHandler;
 
@@ -23,10 +27,16 @@ impl InviteHandler {
         Self
     }
 
+    /// Will always provide a valid null terminated string to the join handler.
+    ///
+    /// The join handler is called when the discord rpc client joins a party. Has to handled immediately.
+    ///
+    /// Discord doesn't track who is in the party. Discord only sends the secrets.
     pub fn set_join_handler(&self, handler: JoinHandler) {
         *JOIN_HANDLER_FUNCTION.lock() = handler;
     }
 
+    /// sets a secret for party which will be provided to everyone that joins the party
     pub fn set_secret(&self, secret: *const c_char) -> IniviteHandlerResult {
         if secret.is_null() {
             return IniviteHandlerResult::Failure;
@@ -40,6 +50,7 @@ impl InviteHandler {
         IniviteHandlerResult::Sucess
     }
 
+    /// removes the secret which destroys the party invite
     pub fn clear_secret(&self) {
         let secrets = &mut PLUGIN.wait().activity.lock().secrets;
 
