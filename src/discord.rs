@@ -99,6 +99,7 @@ async fn handle_activity_events(
 ) -> Option<()> {
     match events.try_recv().ok()? {
         ActivityEvent::Join(join) => {
+            log::info!("invite proccessing");
             let secret = try_cstring(&join.secret).expect("I like null bytes in my strings cool");
             JOIN_HANDLER_FUNCTION.lock()(secret.as_ptr())
         }

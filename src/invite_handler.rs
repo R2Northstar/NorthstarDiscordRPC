@@ -7,14 +7,15 @@ pub static JOIN_HANDLER_FUNCTION: Mutex<JoinHandler> = Mutex::new(default_join_h
 
 type JoinHandler = extern "C" fn(*const c_char);
 
-/// Success/Failure
+/// C Compatible Result Enum
 ///
 /// fails if the string is non utf-8 or the pointer is null
 #[repr(C)]
 #[must_use]
 pub enum IniviteHandlerResult {
-    Sucess,
-    Failure,
+    Ok,
+    NullSecret,
+    NonUtf8Secret,
 }
 
 /// registered as "InviteHandler001"
@@ -39,15 +40,15 @@ impl InviteHandler {
     /// sets a secret for party which will be provided to everyone that joins the party
     pub fn set_secret(&self, secret: *const c_char) -> IniviteHandlerResult {
         if secret.is_null() {
-            return IniviteHandlerResult::Failure;
+            return IniviteHandlerResult::NullSecret;
         }
 
         let Some(secret) = unsafe { CStr::from_ptr(secret) }.to_str().ok() else {
-            return IniviteHandlerResult::Failure;
+            return IniviteHandlerResult::NonUtf8Secret;
         };
 
         PLUGIN.wait().activity.lock().secrets.join = Some(secret.to_string());
-        IniviteHandlerResult::Sucess
+        IniviteHandlerResult::Ok
     }
 
     /// removes the secret which destroys the party invite
