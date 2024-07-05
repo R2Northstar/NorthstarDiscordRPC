@@ -18,6 +18,7 @@ use crate::{exports::PLUGIN, invite_handler::JOIN_HANDLER_FUNCTION};
 const APP_ID: i64 = 941428101429231617;
 
 /// struct to hold everything required to run discord rpc
+#[allow(dead_code)]
 pub struct Client {
     pub discord: Discord,
     pub user: User,
