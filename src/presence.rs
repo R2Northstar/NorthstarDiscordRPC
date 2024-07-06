@@ -3,9 +3,7 @@
 use rrplug::mid::squirrel::sqvm_to_context;
 use rrplug::prelude::*;
 use rrplug::{
-    bindings::squirrelclasstypes::ScriptContext,
-    call_sq_function,
-    high::squirrel::compile_string,
+    bindings::squirrelclasstypes::ScriptContext, call_sq_function, high::squirrel::compile_string,
 };
 use std::ptr::NonNull;
 use std::{
