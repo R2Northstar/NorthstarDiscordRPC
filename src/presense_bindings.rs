@@ -37,16 +37,16 @@ pub struct GameStateStruct {
 #[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
 /// binding to ServerGameState
 pub enum SVGameState {
-	WaitingForCustomStart,
-	WaitingForPlayers,
-	PickLoadout,
-	Prematch,
-	Playing,
-	SuddenDeath,
-	SwitchingSides,
-	WinnerDetermined,
-	Epilogue,
-	Postmatch,
+    WaitingForCustomStart,
+    WaitingForPlayers,
+    PickLoadout,
+    Prematch,
+    Playing,
+    SuddenDeath,
+    SwitchingSides,
+    WinnerDetermined,
+    Epilogue,
+    Postmatch,
 }
 
 #[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
