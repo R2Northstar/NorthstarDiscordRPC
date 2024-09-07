@@ -127,7 +127,10 @@ fn on_presence_updated(
             activity.end = None;
         }
         GameState::Lobby => {
-            activity.party = None;
+            activity.party = Some((
+                cl_presence.current_players.try_into().unwrap_or_default(),
+                cl_presence.max_players.try_into().unwrap_or_default(),
+            ));
             activity.details = "Lobby".to_string();
             activity.state = "In the Lobby".to_string();
             activity.large_image = Some("northstar".to_string());
@@ -150,6 +153,17 @@ fn on_presence_updated(
             if cl_presence.playlist == "campaign" {
                 activity.party = None;
                 activity.end = None;
+            } if else cl_presence.playlist == "fd" {
+                cl_presence
+                    .playlist_displayname
+                    .clone_into(&mut activity.state);
+                if cl_presence.fd_waveNumber = -1 {
+                    activity.details = Some("On Wave Break".to_string());
+                } else {
+                activity.details = format!(
+                    "Wave: {} of {}",
+                    cl_presence.fd_waveNumber, cl_presence.fd_totalWaves,
+                );}
             } else {
                 cl_presence
                     .playlist_displayname
