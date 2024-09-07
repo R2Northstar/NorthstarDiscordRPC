@@ -11,7 +11,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use crate::presense_bindings::{GameState, GameStateStruct, UIPresenceStruct};
+use crate::presense_bindings::{GameState, GameStateStruct, UIPresenceStruct, SVGameState};
 
 // heartbeat for pulling presence
 pub fn run_presence_updates(sqvm: NonNull<HSquirrelVM>) {
@@ -184,16 +184,16 @@ fn on_presence_updated(
                 }
             }
             // This will override previous details established whenever server is not in the Playing gamestate, so friends can see at which stage a match currently is
-            if cl_presence.servergamestate != 4 {
-                activity.details = match cl_presence.servergamestate {
-                    1 => "Waiting Players to Load",
-                    2 => "Titan Selection",
-                    3 => "Match Starting",
-                    5 => "In Sudden Death",
-                    6 => "Switching Sides",
-                    7 => "Winner Determined",
-                    8 => "In Epilogue",
-                    9 => "Match Ending",
+            if SVGameState::from_i32( cl_presence.servergamestate ) != SVGameState::Playing {
+                activity.details = match SVGameState::from_i32( cl_presence.servergamestate ) {
+                    SVGameState::WaitingForPlayers => "Waiting Players to Load",
+                    SVGameState::PickLoadout => "Titan Selection",
+                    SVGameState::Prematch => "Match Starting",
+                    SVGameState::SuddenDeath => "In Sudden Death",
+                    SVGameState::SwitchingSides => "Switching Sides",
+                    SVGameState::WinnerDetermined => "Winner Determined",
+                    SVGameState::Epilogue => "In Epilogue",
+                    SVGameState::Postmatch => "Match Ending",
                     _ => "",
                 }
                 .to_string();
