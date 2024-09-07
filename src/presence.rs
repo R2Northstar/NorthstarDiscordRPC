@@ -11,7 +11,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use crate::presense_bindings::{GameState, GameStateStruct, UIPresenceStruct, SVGameState};
+use crate::presense_bindings::{GameState, GameStateStruct, SVGameState, UIPresenceStruct};
 
 // heartbeat for pulling presence
 pub fn run_presence_updates(sqvm: NonNull<HSquirrelVM>) {
