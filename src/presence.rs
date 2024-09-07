@@ -184,8 +184,8 @@ fn on_presence_updated(
                 }
             }
             // This will override previous details established whenever server is not in the Playing gamestate, so friends can see at which stage a match currently is
-            if SVGameState::from_i32( cl_presence.servergamestate ) != SVGameState::Playing {
-                activity.details = match SVGameState::from_i32( cl_presence.servergamestate ) {
+            if SVGameState::from_i32(cl_presence.servergamestate) != SVGameState::Playing {
+                activity.details = match SVGameState::from_i32(cl_presence.servergamestate) {w
                     SVGameState::WaitingForPlayers => "Waiting Players to Load",
                     SVGameState::PickLoadout => "Titan Selection",
                     SVGameState::Prematch => "Match Starting",
