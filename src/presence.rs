@@ -157,12 +157,12 @@ fn on_presence_updated(
                 cl_presence
                     .playlist_displayname
                     .clone_into(&mut activity.state);
-                if cl_presence.fd_waveNumber = -1 {
+                if cl_presence.fd_wavenumber = -1 {
                     activity.details = Some("On Wave Break".to_string());
                 } else {
                 activity.details = format!(
                     "Wave: {} of {}",
-                    cl_presence.fd_waveNumber, cl_presence.fd_totalWaves,
+                    cl_presence.fd_wavenumber, cl_presence.fd_totalwaves,
                 );}
             } else {
                 cl_presence

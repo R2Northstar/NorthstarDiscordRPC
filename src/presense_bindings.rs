@@ -29,6 +29,8 @@ pub struct GameStateStruct {
     pub other_highest_score: i32,
     pub max_score: i32,
     pub time_end: f32,
+    pub fd_wavenumber: i32,
+    pub fd_totalwaves: i32,
 }
 
 #[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
