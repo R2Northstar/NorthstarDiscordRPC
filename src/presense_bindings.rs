@@ -34,6 +34,8 @@ pub struct GameStateStruct {
     pub fd_totalwaves: i32,
 }
 
+#[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
+/// binding to ServerGameState
 pub enum SVGameState {
 	WaitingForCustomStart,
 	WaitingForPlayers,
