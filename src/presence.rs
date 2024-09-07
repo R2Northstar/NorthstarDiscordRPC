@@ -160,9 +160,9 @@ fn on_presence_updated(
                 if cl_presence.fd_wavenumber = -1 {
                     activity.details = Some("On Wave Break".to_string());
                 } else {
-                activity.details = format!(
-                    "Wave: {} of {}",
-                    cl_presence.fd_wavenumber, cl_presence.fd_totalwaves);
+                    activity.details = format!(
+                        "Wave: {} of {}",
+                        cl_presence.fd_wavenumber, cl_presence.fd_totalwaves);
                 }
             } else {
                 cl_presence
