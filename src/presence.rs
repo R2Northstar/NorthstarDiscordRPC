@@ -162,7 +162,8 @@ fn on_presence_updated(
                 } else {
                     activity.details = format!(
                         "Wave: {} of {}",
-                        cl_presence.fd_wavenumber, cl_presence.fd_totalwaves);
+                        cl_presence.fd_wavenumber, cl_presence.fd_totalwaves
+                    );
                 }
             } else {
                 cl_presence
