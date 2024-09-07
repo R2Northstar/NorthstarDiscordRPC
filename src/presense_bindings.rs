@@ -34,7 +34,9 @@ pub struct GameStateStruct {
     pub fd_totalwaves: i32,
 }
 
-#[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
+#[derive(
+    PushToSquirrelVm, GetFromSquirrelVm, GetFromSQObject, Clone, Copy, Debug, PartialEq, Eq,
+)]
 #[repr(i32)]
 /// binding to ServerGameState
 pub enum SVGameState {

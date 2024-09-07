@@ -183,7 +183,7 @@ fn on_presence_updated(
                     activity.end = Some(current_time + ig_end);
                 }
             }
-            /// This will override previous details established whenever server is not in the Playing gamestate, so friends can see at which stage a match currently is
+            // This will override previous details established whenever server is not in the Playing gamestate, so friends can see at which stage a match currently is
             if cl_presence.servergamestate != SVGameState::Playing {
                 activity.details = match cl_presence.servergamestate {
                     SVGameState::WaitingForPlayers => "Waiting Players to Load",
