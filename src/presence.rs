@@ -153,7 +153,7 @@ fn on_presence_updated(
             if cl_presence.playlist == "campaign" {
                 activity.party = None;
                 activity.end = None;
-            } if else cl_presence.playlist == "fd" {
+            } else if cl_presence.playlist == "fd" {
                 cl_presence
                     .playlist_displayname
                     .clone_into(&mut activity.state);
