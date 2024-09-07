@@ -52,6 +52,12 @@ pub enum SVGameState {
     Postmatch,
 }
 
+impl Default for SVGameState {
+    fn default() -> Self {
+        Self::WaitingForCustomStart
+    }
+}
+
 #[derive(PushToSquirrelVm, GetFromSquirrelVm, Default, Clone)]
 /// binding to UIPresenceStruct
 pub struct UIPresenceStruct {

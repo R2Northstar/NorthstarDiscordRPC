@@ -194,6 +194,7 @@ fn on_presence_updated(
                     SVGameState::WinnerDetermined => "Winner Determined",
                     SVGameState::Epilogue => "In Epilogue",
                     SVGameState::Postmatch => "Match Ending",
+                    _ => "",
                 }
                 .to_string();
             }
