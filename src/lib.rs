@@ -49,9 +49,9 @@ impl Plugin for DiscordRpcPlugin {
         c"DISCORDRPC",
         PluginContext::CLIENT,
         PluginColor {
-            red: 0,
-            green: 0,
-            blue: 255,
+            red: 114,
+            green: 137,
+            blue: 218,
         },
     );
 
