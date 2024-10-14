@@ -395,8 +395,9 @@ dependencies = [
 
 [[package]]
 name = "rrplug"
-version = "4.0.0"
-source = "git+https://github.com/R2NorthstarTools/rrplug.git?rev=e183295ec923a44427cdfac3d5c232853f48063d#e183295ec923a44427cdfac3d5c232853f48063d"
+version = "4.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a95b84e776830a5cb6074d943fee2c917882b67cbac6036f2e110126fb7d2689"
 dependencies = [
  "bitflags",
  "log",
@@ -409,8 +410,9 @@ dependencies = [
 
 [[package]]
 name = "rrplug_proc"
-version = "4.0.0"
-source = "git+https://github.com/R2NorthstarTools/rrplug.git?rev=e183295ec923a44427cdfac3d5c232853f48063d#e183295ec923a44427cdfac3d5c232853f48063d"
+version = "4.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b4b6d5c202326f080f0e89ff097656db412fc5aebecb09287a9283199b471f6b"
 dependencies = [
  "proc-macro2",
  "quote",
