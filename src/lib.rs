@@ -87,6 +87,12 @@ impl Plugin for DiscordRpcPlugin {
             _ => {}
         }
     }
+
+    fn on_reload_request(&self) -> reloading::ReloadResponse {
+        log::info!("reloading request for DiscordRpc");
+        // SAFETY: this plugin doesn't have anything that gets called or referenced from the game (usally) so it's safe
+        unsafe { reloading::ReloadResponse::allow_reload() }
+    }
 }
 
 entry!(DiscordRpcPlugin);
