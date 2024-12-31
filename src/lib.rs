@@ -3,15 +3,18 @@
 use discord_sdk::activity::Secrets;
 use parking_lot::Mutex;
 use rrplug::prelude::*;
+use rrplug::{bindings::plugin_abi::PluginColor, interfaces::manager::register_interface};
 use tokio::runtime::Runtime;
 
 use crate::{
     discord::async_main,
+    invite_handler::InviteHandler,
     presence::run_presence_updates,
     presense_bindings::{GameState, GameStateStruct, UIPresenceStruct},
 };
 
 pub(crate) mod discord;
+pub(crate) mod invite_handler;
 pub(crate) mod presence;
 pub(crate) mod presense_bindings;
 
@@ -40,15 +43,22 @@ pub struct DiscordRpcPlugin {
 
 #[deny(non_snake_case)]
 impl Plugin for DiscordRpcPlugin {
-    const PLUGIN_INFO: PluginInfo = PluginInfo::new(
-        "DISCORDRPC\0",
-        "DSCRD-RPC\0",
-        "DISCORDRPC\0",
+    const PLUGIN_INFO: PluginInfo = PluginInfo::new_with_color(
+        c"DISCORDRPC",
+        c"DSCRD-RPC",
+        c"DISCORDRPC",
         PluginContext::CLIENT,
+        PluginColor {
+            red: 114,
+            green: 137,
+            blue: 218,
+        },
     );
 
     fn new(_: bool) -> Self {
         register_sq_functions(presence::fetch_presence);
+
+        unsafe { register_interface("InviteHandler001", InviteHandler::new()) };
 
         let activity = Mutex::new(ActivityData {
             large_image: Some("northstar".to_string()),
@@ -72,7 +82,7 @@ impl Plugin for DiscordRpcPlugin {
     fn on_sqvm_created(&self, sqvm_handle: &CSquirrelVMHandle, _: EngineToken) {
         match sqvm_handle.get_context() {
             ScriptContext::CLIENT | ScriptContext::UI => {
-                run_presence_updates(unsafe { sqvm_handle.get_sqvm() })
+                run_presence_updates(unsafe { sqvm_handle.get_sqvm().take() })
             }
             _ => {}
         }
