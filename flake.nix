@@ -1,7 +1,6 @@
 {
   inputs = {
-    # the only version that seems to support crossplatform compiling lol
-    # nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     utils.url = "github:numtide/flake-utils";
     rust-overlay = {
       url = "github:oxalica/rust-overlay";
@@ -25,7 +24,7 @@
             config = "x86_64-w64-mingw32";
             libc = "msvcrt";
           };
-          allowUnsupportedSystem = true;
+          config.allowUnsupportedSystem = true;
         };
 
         toolchain = (pkgs.pkgsBuildHost.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml);
@@ -35,38 +34,39 @@
 
         packages = {
           discordrpc =
-            let
-              rust-bin = rust-overlay.lib.mkRustBin { } pkgs.buildPackages;
-            in
-            pkgs.rustPlatform.buildRustPackage (final: {
-              name = "DiscordRPC";
-              version = "13.0.0";
+            pkgs.callPackage
+              (
+                {
+                  lib,
+                  rustPlatform,
+                  rust-bin,
+                }:
+                rustPlatform.buildRustPackage (final: {
+                  name = "DiscordRPC";
+                  version = "13.0.0";
 
-              rustToolchain = rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
-              buildInputs = with pkgs; [
-                windows.mingw_w64_headers
-                windows.pthreads
-              ];
+                  rustToolchain = rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
+                  nativeBuildInputs = [
+                    (rust-bin.fromRustupToolchainFile ./rust-toolchain.toml)
+                  ];
 
-              nativeBuildInputs = [
-                final.rustToolchain
-                pkgs.autoPatchelfHook
-                pkgs.pkg-config
-              ];
+                  src = ./.;
 
-              src = ./.;
+                  meta = {
+                    description = "discord rpc impl for northstar";
+                    homepage = "https://github.com/R2Northstar/NorthstarDiscordRPC";
+                    license = lib.licenses.unlicense;
+                    maintainers = [ "cat_or_not" ];
+                  };
 
-              meta = {
-                description = "discord rpc impl for northstar";
-                homepage = "https://github.com/R2Northstar/NorthstarDiscordRPC";
-                license = pkgs.lib.licenses.unlicense;
-                maintainers = [ "cat_or_not" ];
+                  cargoLock = {
+                    lockFile = ./Cargo.lock;
+                  };
+                })
+              )
+              {
+                rust-bin = rust-overlay.lib.mkRustBin { } pkgs.buildPackages;
               };
-
-              cargoLock = {
-                lockFile = ./Cargo.lock;
-              };
-            });
 
           default = self.packages.${system}.discordrpc;
         };
