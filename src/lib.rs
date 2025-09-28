@@ -1,10 +1,13 @@
 #![allow(non_snake_case)]
 
+use std::sync::atomic::{AtomicBool, Ordering};
+
 use discord_sdk::activity::Secrets;
 use parking_lot::Mutex;
 use rrplug::prelude::*;
 use rrplug::{bindings::plugin_abi::PluginColor, interfaces::manager::register_interface};
 use tokio::runtime::Runtime;
+use tokio::task::JoinHandle;
 
 use crate::{
     discord::async_main,
@@ -39,6 +42,8 @@ pub struct ActivityData {
 pub struct DiscordRpcPlugin {
     pub activity: Mutex<ActivityData>,
     pub presence_data: Mutex<(GameStateStruct, UIPresenceStruct)>,
+    pub runtime: Mutex<Option<(Runtime, JoinHandle<()>)>>,
+    pub is_active: AtomicBool,
 }
 
 #[deny(non_snake_case)]
@@ -66,16 +71,22 @@ impl Plugin for DiscordRpcPlugin {
             ..Default::default()
         });
 
-        std::thread::spawn(|| match Runtime::new() {
-            Ok(rt) => rt.block_on(async_main()),
+        let rt = match Runtime::new() {
+            Ok(rt) => {
+                let handle = rt.spawn(async_main());
+                Some((rt, handle))
+            }
             Err(err) => {
                 log::error!("failed to create a runtime; {:?}", err);
+                None
             }
-        });
+        };
 
         Self {
             activity,
             presence_data: Mutex::new((GameStateStruct::default(), UIPresenceStruct::default())),
+            runtime: Mutex::new(rt),
+            is_active: AtomicBool::new(true),
         }
     }
 
@@ -86,6 +97,21 @@ impl Plugin for DiscordRpcPlugin {
             }
             _ => {}
         }
+    }
+
+    fn on_reload_request(&self) -> reloading::ReloadResponse {
+        let (runtime, handle) = self
+            .runtime
+            .lock()
+            .take()
+            .expect("runtime should exist when unloading the plugin");
+        self.is_active.store(false, Ordering::Release);
+        runtime.block_on(async { _ = handle.await });
+        runtime.shutdown_background();
+
+        log::info!("reloading request for DiscordRpc");
+        // SAFETY: this plugin doesn't have anything that gets called or referenced from the game (usally) so it's safe
+        unsafe { reloading::ReloadResponse::allow_reload() }
     }
 }
 
