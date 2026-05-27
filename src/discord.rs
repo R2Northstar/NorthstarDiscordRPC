@@ -1,6 +1,6 @@
 #![deny(non_snake_case)]
 
-use std::num::NonZeroU32;
+use std::{num::NonZeroU32, sync::atomic::Ordering};
 
 use discord_sdk::{
     activity::{events::ActivityEvent, ActivityBuilder, Assets, JoinRequestReply, PartyPrivacy},
@@ -46,7 +46,10 @@ pub async fn async_main() {
 
     let mut events = client.wheel.activity().0;
 
-    loop {
+    while PLUGIN
+        .get()
+        .is_some_and(|plugin| plugin.is_active.load(Ordering::Acquire))
+    {
         let data = activity.lock().clone();
 
         if let Some(img) = &data.large_image {
